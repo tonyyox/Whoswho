@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { IWhosWhoProps, IOrgUser, IOrgChartNode } from './IWhosWhoProps';
-import { GraphService } from './services/GraphService';
+import { PeopleService } from './services/GraphService';
 import { OrgChart } from './OrgChart';
 import { SearchBox } from './SearchBox';
 import { Spinner, SpinnerSize, MessageBar, MessageBarType } from '@fluentui/react';
@@ -13,9 +13,9 @@ const WhosWho: React.FC<IWhosWhoProps> = (props) => {
   const [error, setError] = useState<string | null>(null);
   const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null);
 
-  const graphService = React.useMemo(
-    () => new GraphService(props.graphClient),
-    [props.graphClient]
+  const peopleService = React.useMemo(
+    () => new PeopleService(props.spHttpClient, props.siteUrl),
+    [props.spHttpClient, props.siteUrl]
   );
 
   const loadUsers = useCallback(async () => {
@@ -23,7 +23,7 @@ const WhosWho: React.FC<IWhosWhoProps> = (props) => {
       setLoading(true);
       setError(null);
 
-      const orgUsers: IOrgUser[] = await graphService.getAllUsersWithManagers();
+      const orgUsers: IOrgUser[] = await peopleService.getAllUsersWithManagers();
 
       const chartNodes: IOrgChartNode[] = orgUsers.map((user) => ({
         id: user.id,
@@ -43,7 +43,7 @@ const WhosWho: React.FC<IWhosWhoProps> = (props) => {
     } finally {
       setLoading(false);
     }
-  }, [graphService]);
+  }, [peopleService]);
 
   useEffect(() => {
     loadUsers();

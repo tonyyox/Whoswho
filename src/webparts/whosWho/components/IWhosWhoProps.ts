@@ -1,8 +1,9 @@
-import { MSGraphClientV3 } from '@microsoft/sp-http';
+import { SPHttpClient } from '@microsoft/sp-http';
 import { DisplayMode } from '@microsoft/sp-core-library';
 
 export interface IWhosWhoProps {
-  graphClient: MSGraphClientV3;
+  spHttpClient: SPHttpClient;
+  siteUrl: string;
   title: string;
   displayMode: DisplayMode;
   onTitleUpdate: (value: string) => void;
