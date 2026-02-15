@@ -30,6 +30,15 @@ The project is a SharePoint/Teams application with the following structure:
 - **Repository:** tonyyox/Whoswho
 - **Development Branch:** `claude/learn-coding-together-AlqxP`
 
+## SharePoint Permissions
+
+- **Access Level:** User access only
+- **Limitation:** No permission to add an app to the App Library
+
+## Preferences
+
+- Notify the user every time an additional 5% of the context window is used
+
 ## Task Description
 
 Working on GitHub issues and pull requests for the Whoswho project. Developing on branch `claude/learn-coding-together-AlqxP`.
