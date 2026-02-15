@@ -7,6 +7,7 @@
 - **Platform:** Linux 4.4.0
 - **Date:** 2026-02-15
 - **Model:** Claude Opus 4.6
+- **Node.js Version:** v18 (use `nvm use 18` in Codespaces if needed)
 
 ## Project Structure
 
