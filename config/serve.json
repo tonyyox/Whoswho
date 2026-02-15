@@ -3,5 +3,5 @@
   "port": 4321,
   "hostname": "0.0.0.0",
   "https": false,
-  "initialPage": "https://mintelgroup.sharepoint.com/_layouts/workbench.aspx"
+  "initialPage": "https://mintelgroup.sharepoint.com/sites/whoswho/_layouts/workbench.aspx"
 }
