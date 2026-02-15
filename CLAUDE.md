@@ -36,6 +36,8 @@ The project is a SharePoint/Teams application with the following structure:
 - **Access Level:** User access only
 - **Limitation:** No permission to add an app to the App Library
 - **Admin Access:** Not available. Cannot get SharePoint/tenant admin access. Deployment must work within user-level permissions only.
+- **Tenant:** mintelgroup
+- **Workbench URL:** https://mintelgroup.sharepoint.com/_layouts/15/workbench.aspx
 
 ## How We Work Together
 
