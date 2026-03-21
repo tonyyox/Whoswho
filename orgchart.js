@@ -54,20 +54,17 @@
       if (CONFIG.siteUrl) return CONFIG.siteUrl;
       if (this._siteUrl) return this._siteUrl;
 
-      // Try SharePoint page context
       if (window._spPageContextInfo && window._spPageContextInfo.webAbsoluteUrl) {
         this._siteUrl = window._spPageContextInfo.webAbsoluteUrl;
         return this._siteUrl;
       }
 
-      // Parse from URL: https://tenant.sharepoint.com/sites/SiteName/...
       var match = window.location.href.match(/(https:\/\/[^/]+\/sites\/[^/]+)/);
       if (match) {
         this._siteUrl = match[1];
         return this._siteUrl;
       }
 
-      // Fallback to origin
       this._siteUrl = window.location.origin;
       return this._siteUrl;
     },
@@ -82,7 +79,6 @@
         credentials: 'same-origin'
       }).then(function (response) {
         if (response.status === 429) {
-          // Throttled - wait 1s and retry once
           return new Promise(function (resolve) {
             setTimeout(resolve, 1000);
           }).then(function () {
@@ -175,7 +171,6 @@
       var self = this;
       var siteUrl = this.getSiteUrl();
 
-      // Build lookup: accountName -> user
       var accountMap = {};
       for (var i = 0; i < users.length; i++) {
         accountMap[users[i].userPrincipalName.toLowerCase()] = users[i];
@@ -230,71 +225,112 @@
   };
 
   // =========================================================================
-  // Chart Renderer
+  // Chart Renderer (pure CSS/JS - no external dependencies)
   // =========================================================================
 
   var ChartRenderer = {
-    _chart: null,
+    _container: null,
     _data: null,
+    _tree: null,
     _highlightedId: null,
+    _collapsed: {},
 
-    init: function (containerSelector) {
-      this._containerSelector = containerSelector;
+    init: function (containerEl) {
+      this._container = containerEl;
+    },
+
+    _buildTree: function (data) {
+      var map = {};
+      var roots = [];
+      var i;
+
+      for (i = 0; i < data.length; i++) {
+        map[data[i].id] = { data: data[i], children: [] };
+      }
+
+      for (i = 0; i < data.length; i++) {
+        var node = map[data[i].id];
+        var parentId = data[i].parentId;
+        if (parentId && map[parentId]) {
+          map[parentId].children.push(node);
+        } else {
+          roots.push(node);
+        }
+      }
+
+      return roots;
     },
 
     render: function (data) {
       this._data = data;
-      var el = document.querySelector(this._containerSelector);
-      if (el) el.innerHTML = '';
-
-      this._chart = new d3.OrgChart()
-        .container(this._containerSelector)
-        .data(data)
-        .nodeId(function (d) { return d.id; })
-        .parentNodeId(function (d) { return d.parentId; })
-        .nodeWidth(function () { return 280; })
-        .nodeHeight(function () { return 140; })
-        .childrenMargin(function () { return 60; })
-        .siblingsMargin(function () { return 30; })
-        .compactMarginBetween(function () { return 35; })
-        .compactMarginPair(function () { return 30; })
-        .neighbourMargin(function () { return 30; })
-        .nodeContent(function (d) {
-          return ChartRenderer._nodeTemplate(d.data, d.height);
-        })
-        .render();
+      this._tree = this._buildTree(data);
+      this._drawTree();
     },
 
-    highlightAndCenter: function (userId) {
-      this._highlightedId = userId;
-      // Re-render with new highlight, then center
-      this._chart
-        .nodeContent(function (d) {
-          return ChartRenderer._nodeTemplate(d.data, d.height);
-        })
-        .render();
+    _drawTree: function () {
+      this._container.innerHTML = '';
 
-      try {
-        this._chart.setCentered(userId).render();
-      } catch (e) {
-        console.warn('Could not center on node:', e);
+      var viewport = document.createElement('div');
+      viewport.className = 'org-viewport';
+
+      var treeEl = document.createElement('div');
+      treeEl.className = 'org-tree';
+
+      for (var i = 0; i < this._tree.length; i++) {
+        treeEl.appendChild(this._renderNode(this._tree[i]));
       }
+
+      viewport.appendChild(treeEl);
+      this._container.appendChild(viewport);
     },
 
-    clearHighlight: function () {
-      this._highlightedId = null;
-      this._chart
-        .nodeContent(function (d) {
-          return ChartRenderer._nodeTemplate(d.data, d.height);
-        })
-        .render();
+    _renderNode: function (node) {
+      var self = this;
+      var wrapper = document.createElement('div');
+      wrapper.className = 'org-node-wrapper';
+
+      // Card
+      var card = document.createElement('div');
+      card.className = 'org-card';
+      if (node.data.id === this._highlightedId) {
+        card.classList.add('org-card--highlighted');
+      }
+      card.setAttribute('data-id', node.data.id);
+
+      card.innerHTML = this._cardHtml(node.data, node.children.length);
+
+      // Click to expand/collapse
+      if (node.children.length > 0) {
+        var toggleBtn = card.querySelector('.org-toggle');
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var id = node.data.id;
+            self._collapsed[id] = !self._collapsed[id];
+            self._drawTree();
+          });
+        }
+      }
+
+      wrapper.appendChild(card);
+
+      // Children
+      var isCollapsed = this._collapsed[node.data.id];
+      if (node.children.length > 0 && !isCollapsed) {
+        var childrenContainer = document.createElement('div');
+        childrenContainer.className = 'org-children';
+
+        for (var i = 0; i < node.children.length; i++) {
+          childrenContainer.appendChild(this._renderNode(node.children[i]));
+        }
+
+        wrapper.appendChild(childrenContainer);
+      }
+
+      return wrapper;
     },
 
-    _nodeTemplate: function (node, height) {
-      var isHighlighted = node.id === ChartRenderer._highlightedId;
-      var borderColor = isHighlighted ? '#0078d4' : '#e1e1e1';
-      var bgColor = isHighlighted ? '#f0f6ff' : '#ffffff';
-
+    _cardHtml: function (node, childCount) {
       var initials = node.displayName
         .split(' ')
         .map(function (n) { return n[0]; })
@@ -303,54 +339,61 @@
         .toUpperCase();
 
       var photoHtml = node.photo
-        ? '<img src="' + node.photo + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" />'
-        : initials;
+        ? '<img class="org-avatar-img" src="' + node.photo + '" alt="" />'
+        : '<span>' + initials + '</span>';
 
-      var deptHtml = node.department ? '<div>\uD83D\uDCC1 ' + node.department + '</div>' : '';
-      var officeHtml = node.officeLocation ? '<div>\uD83D\uDCCD ' + node.officeLocation + '</div>' : '';
+      var toggleHtml = '';
+      if (childCount > 0) {
+        var isCollapsed = this._collapsed[node.data ? node.data.id : node.id];
+        // node here is already node.data from _renderNode
+        isCollapsed = this._collapsed[node.id];
+        var arrow = isCollapsed ? '&#9654;' : '&#9660;';
+        toggleHtml = '<button class="org-toggle" title="Expand/Collapse">' + arrow + ' ' + childCount + '</button>';
+      }
+
+      var parts = [];
+      if (node.department) parts.push(node.department);
+      if (node.officeLocation) parts.push(node.officeLocation);
+      var metaHtml = parts.length > 0
+        ? '<div class="org-card-meta">' + parts.join(' &middot; ') + '</div>'
+        : '';
 
       return '' +
-        '<div style="' +
-          'padding: 16px;' +
-          'border-radius: 8px;' +
-          'border: 2px solid ' + borderColor + ';' +
-          'background-color: ' + bgColor + ';' +
-          'font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;' +
-          'height: ' + height + 'px;' +
-          'box-sizing: border-box;' +
-          'display: flex;' +
-          'flex-direction: column;' +
-          'transition: all 0.3s ease;' +
-          'box-shadow: 0 2px 4px rgba(0,0,0,0.1);' +
-        '">' +
-          '<div style="display: flex; align-items: center; margin-bottom: 8px;">' +
-            '<div style="' +
-              'width: 40px;' +
-              'height: 40px;' +
-              'border-radius: 50%;' +
-              'background: linear-gradient(135deg, #0078d4, #106ebe);' +
-              'color: white;' +
-              'display: flex;' +
-              'align-items: center;' +
-              'justify-content: center;' +
-              'font-size: 16px;' +
-              'font-weight: 600;' +
-              'margin-right: 12px;' +
-              'flex-shrink: 0;' +
-            '">' + photoHtml + '</div>' +
-            '<div style="overflow: hidden;">' +
-              '<div style="font-weight: 600; font-size: 14px; color: #323130; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' +
-                node.displayName +
-              '</div>' +
-              '<div style="font-size: 12px; color: #605e5c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' +
-                node.jobTitle +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div style="font-size: 11px; color: #8a8886; margin-top: auto;">' +
-            deptHtml + officeHtml +
-          '</div>' +
-        '</div>';
+        '<div class="org-avatar">' + photoHtml + '</div>' +
+        '<div class="org-card-info">' +
+          '<div class="org-card-name">' + node.displayName + '</div>' +
+          '<div class="org-card-title">' + (node.jobTitle || '') + '</div>' +
+          metaHtml +
+        '</div>' +
+        toggleHtml;
+    },
+
+    highlightAndCenter: function (userId) {
+      this._highlightedId = userId;
+
+      // Expand ancestors so the node is visible
+      var parentMap = {};
+      for (var i = 0; i < this._data.length; i++) {
+        parentMap[this._data[i].id] = this._data[i].parentId;
+      }
+      var current = parentMap[userId];
+      while (current) {
+        this._collapsed[current] = false;
+        current = parentMap[current];
+      }
+
+      this._drawTree();
+
+      // Scroll into view
+      var el = this._container.querySelector('[data-id="' + userId + '"]');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      }
+    },
+
+    clearHighlight: function () {
+      this._highlightedId = null;
+      this._drawTree();
     }
   };
 
@@ -389,7 +432,6 @@
         }
       });
 
-      // Close results when clicking outside
       document.addEventListener('click', function (e) {
         if (!inputEl.contains(e.target) && !resultsEl.contains(e.target)) {
           self.hideResults();
@@ -478,7 +520,7 @@
         App.init();
       });
 
-      ChartRenderer.init('#chart-container');
+      ChartRenderer.init(chartEl);
 
       var dataPromise;
 
@@ -495,7 +537,6 @@
           return SharePointService.fetchAllManagers(users, function (msg) {
             loadingTextEl.textContent = msg;
           }).then(function () {
-            // Remove SP-specific field before passing to chart
             return users.map(function (u) {
               return {
                 id: u.id,
@@ -525,15 +566,7 @@
       }).catch(function (err) {
         console.error('Failed to load org chart data:', err);
         loadingEl.classList.add('hidden');
-        var msg;
-        if (err.message && err.message.indexOf('40') !== -1) {
-          msg = 'You may not have permission to access this data. Make sure you are signed into SharePoint.';
-        } else if (typeof d3 === 'undefined' || typeof d3.OrgChart === 'undefined') {
-          msg = 'Required libraries failed to load. Check your internet connection and try again.';
-        } else {
-          msg = 'Something went wrong loading the directory: ' + (err.message || err) + '. Please try again.';
-        }
-        errorMsgEl.textContent = msg;
+        errorMsgEl.textContent = 'Something went wrong loading the directory: ' + (err.message || err) + '. Please try again.';
         errorEl.classList.add('visible');
       });
     }
