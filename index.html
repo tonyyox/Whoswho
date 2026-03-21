@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Who's Who - Org Chart</title>
+  <link rel="stylesheet" href="orgchart.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1 class="title">Who's Who</h1>
+      <div class="search-container">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search by name, title, or department..."
+          autocomplete="off"
+        >
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </header>
+
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Loading directory...</div>
+    </div>
+
+    <div id="error-container" class="error-container">
+      <div id="error-message" class="error-message"></div>
+      <button id="retry-button" class="retry-button">Try Again</button>
+    </div>
+
+    <div id="chart-container" class="chart-container"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2/build/d3-flextree.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3/build/d3-org-chart.min.js"></script>
+  <script src="orgchart.js"></script>
+</body>
+</html>
