@@ -238,16 +238,17 @@
     _data: null,
     _highlightedId: null,
 
-    init: function (containerEl) {
-      this._container = containerEl;
+    init: function (containerSelector) {
+      this._containerSelector = containerSelector;
     },
 
     render: function (data) {
       this._data = data;
-      this._container.innerHTML = '';
+      var el = document.querySelector(this._containerSelector);
+      if (el) el.innerHTML = '';
 
       this._chart = new d3.OrgChart()
-        .container(this._container)
+        .container(this._containerSelector)
         .data(data)
         .nodeId(function (d) { return d.id; })
         .parentNodeId(function (d) { return d.parentId; })
@@ -477,7 +478,7 @@
         App.init();
       });
 
-      ChartRenderer.init(chartEl);
+      ChartRenderer.init('#chart-container');
 
       var dataPromise;
 
@@ -524,9 +525,15 @@
       }).catch(function (err) {
         console.error('Failed to load org chart data:', err);
         loadingEl.classList.add('hidden');
-        errorMsgEl.textContent = err.message && err.message.indexOf('40') !== -1
-          ? 'You may not have permission to access this data. Make sure you are signed into SharePoint.'
-          : 'Something went wrong loading the directory. Please try again.';
+        var msg;
+        if (err.message && err.message.indexOf('40') !== -1) {
+          msg = 'You may not have permission to access this data. Make sure you are signed into SharePoint.';
+        } else if (typeof d3 === 'undefined' || typeof d3.OrgChart === 'undefined') {
+          msg = 'Required libraries failed to load. Check your internet connection and try again.';
+        } else {
+          msg = 'Something went wrong loading the directory: ' + (err.message || err) + '. Please try again.';
+        }
+        errorMsgEl.textContent = msg;
         errorEl.classList.add('visible');
       });
     }
