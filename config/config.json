@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "whos-who-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/whosWho/WhosWhoWebPart.js",
+          "manifest": "./src/webparts/whosWho/WhosWhoWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "WhosWhoWebPartStrings": "lib/webparts/whosWho/loc/{locale}.js"
+  }
+}
