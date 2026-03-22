@@ -32,7 +32,27 @@
   gap: 12px;
 }
 
-/* Card */
+/* Card flip */
+
+.newjoiners-card-flip {
+  perspective: 800px;
+}
+
+.newjoiners-card-flip.flipped {
+  z-index: 10;
+}
+
+.newjoiners-card-flip.flipped .newjoiners-card-inner {
+  transform: rotateY(180deg);
+}
+
+.newjoiners-card-inner {
+  position: relative;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+/* Card (front) */
 
 .newjoiners-card {
   display: flex;
@@ -42,11 +62,42 @@
   border: 1px solid #edebe9;
   border-radius: 8px;
   border-left: 4px solid #0078d4;
+  cursor: pointer;
   transition: box-shadow 0.2s, border-color 0.2s;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .newjoiners-card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Card back */
+
+.newjoiners-card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 2px solid #0078d4;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  cursor: pointer;
+  overflow-y: auto;
+  max-height: 380px;
+}
+
+.newjoiners-back-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
 }
 
 .newjoiners-avatar {
