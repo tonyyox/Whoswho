@@ -6,6 +6,7 @@ WhosWho.ChartRenderer = {
   _tree: null,
   _highlightedId: null,
   _collapsed: {},
+  _flippedEl: null,
 
   init: function (containerEl) {
     this._container = containerEl;
@@ -77,10 +78,15 @@ WhosWho.ChartRenderer = {
 
     // Flip on card click (not on toggle button)
     card.addEventListener('click', function () {
+      if (self._flippedEl && self._flippedEl !== flipEl) {
+        self._flippedEl.classList.remove('flipped');
+      }
       flipEl.classList.add('flipped');
+      self._flippedEl = flipEl;
     });
     back.addEventListener('click', function () {
       flipEl.classList.remove('flipped');
+      if (self._flippedEl === flipEl) self._flippedEl = null;
     });
 
     if (node.children.length > 0) {

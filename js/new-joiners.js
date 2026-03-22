@@ -4,6 +4,7 @@ WhosWho.NewJoinersController = {
   _containerEl: null,
   _users: [],
   _onViewInChart: null,
+  _flippedEl: null,
 
   init: function (containerEl, users, onViewInChart) {
     this._containerEl = containerEl;
@@ -228,11 +229,16 @@ WhosWho.NewJoinersController = {
 
     // Flip on click
     card.addEventListener('click', function () {
+      if (self._flippedEl && self._flippedEl !== flip) {
+        self._flippedEl.classList.remove('flipped');
+      }
       flip.classList.add('flipped');
+      self._flippedEl = flip;
     });
     back.addEventListener('click', function (e) {
       if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
       flip.classList.remove('flipped');
+      if (self._flippedEl === flip) self._flippedEl = null;
     });
 
     return flip;

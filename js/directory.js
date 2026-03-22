@@ -10,6 +10,7 @@ WhosWho.DirectoryController = {
   _onViewInChart: null,
   _displayLimit: 100,
   _filters: { query: '', offices: [], departments: [] },
+  _flippedEl: null,
 
   init: function (toolbarEl, gridWrapperEl, users, onViewInChart) {
     this._toolbarEl = toolbarEl;
@@ -332,15 +333,16 @@ WhosWho.DirectoryController = {
 
     // Flip on click
     card.addEventListener('click', function () {
+      if (self._flippedEl && self._flippedEl !== flip) {
+        self._flippedEl.classList.remove('flipped');
+      }
       flip.classList.add('flipped');
+      self._flippedEl = flip;
     });
-    back.addEventListener('click', function () {
-      flip.classList.remove('flipped');
-    });
-    // Don't flip when clicking links/buttons on back
     back.addEventListener('click', function (e) {
       if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
       flip.classList.remove('flipped');
+      if (self._flippedEl === flip) self._flippedEl = null;
     });
 
     return flip;
