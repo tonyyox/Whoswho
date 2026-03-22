@@ -25,7 +25,15 @@ WhosWho.ChartRenderer = {
   render: function (data) {
     this._data = data;
     this._tree = this._buildTree(data);
+    this._collapseAll();
     this._drawTree();
+  },
+
+  _collapseAll: function () {
+    this._collapsed = {};
+    for (var i = 0; i < this._data.length; i++) {
+      this._collapsed[this._data[i].id] = true;
+    }
   },
 
   _drawTree: function () {
@@ -98,10 +106,21 @@ WhosWho.ChartRenderer = {
 
   highlightAndCenter: function (userId) {
     this._highlightedId = userId;
+
+    // Collapse everything first
+    this._collapseAll();
+
+    // Build parent lookup
     var parentMap = {};
     for (var i = 0; i < this._data.length; i++) parentMap[this._data[i].id] = this._data[i].parentId;
+
+    // Open the ancestor chain from target to root
     var current = parentMap[userId];
     while (current) { this._collapsed[current] = false; current = parentMap[current]; }
+
+    // Open the target node itself so its direct children are visible
+    this._collapsed[userId] = false;
+
     this._drawTree();
     var el = this._container.querySelector('[data-id="' + userId + '"]');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
