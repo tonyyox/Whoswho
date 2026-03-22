@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Who's Who - Org Chart</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/orgchart.css">
+  <link rel="stylesheet" href="css/directory.css">
+  <link rel="stylesheet" href="css/new-joiners.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1 class="title">Who's Who</h1>
+      <nav class="view-tabs">
+        <button class="view-tab view-tab--active" data-view="newjoiners">New Joiners</button>
+        <button class="view-tab" data-view="chart">Org Chart</button>
+        <button class="view-tab" data-view="directory">Directory</button>
+      </nav>
+      <div class="search-container">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search by name, title, or department..."
+          autocomplete="off"
+        >
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </header>
+
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Loading directory...</div>
+    </div>
+
+    <div id="error-container" class="error-container">
+      <div id="error-message" class="error-message"></div>
+      <button id="retry-button" class="retry-button">Try Again</button>
+    </div>
+
+    <div class="view-container">
+      <section id="newjoiners-view" class="view view--active">
+        <div id="newjoiners-container" class="newjoiners-grid-wrapper"></div>
+      </section>
+      <section id="chart-view" class="view">
+        <div id="chart-container" class="chart-container"></div>
+      </section>
+      <section id="directory-view" class="view">
+        <div id="directory-toolbar" class="directory-toolbar"></div>
+        <div id="directory-grid-wrapper" class="directory-grid-wrapper"></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/data-utils.js"></script>
+  <script src="js/sharepoint.js"></script>
+  <script src="js/chart-renderer.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/directory.js"></script>
+  <script src="js/new-joiners.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
