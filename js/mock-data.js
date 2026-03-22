@@ -128,6 +128,64 @@ WhosWho.generateMockData = function () {
     'Infrastructure': ['Systems Engineer', 'Cloud Engineer', 'Network Engineer', 'Site Reliability Engineer', 'Database Administrator', 'Platform Engineer']
   };
 
+  var skillsList = [
+    'Leadership', 'Strategic Planning', 'Agile', 'Scrum', 'Project Management',
+    'Data Analysis', 'Machine Learning', 'Python', 'JavaScript', 'TypeScript',
+    'React', 'Angular', 'Node.js', 'SQL', 'Cloud Architecture', 'AWS', 'Azure',
+    'DevOps', 'CI/CD', 'Docker', 'Kubernetes', 'Microservices', 'REST APIs',
+    'Communication', 'Stakeholder Management', 'Budgeting', 'Negotiation',
+    'UX Design', 'Product Strategy', 'Market Research', 'Sales Strategy',
+    'Risk Assessment', 'Compliance', 'Financial Modelling', 'Cybersecurity',
+    'Networking', 'System Administration', 'Technical Writing', 'Mentoring'
+  ];
+
+  var interestsList = [
+    'Running', 'Photography', 'Cooking', 'Reading', 'Travel', 'Hiking',
+    'Music', 'Cycling', 'Yoga', 'Gaming', 'Gardening', 'Volunteering',
+    'Board Games', 'Tennis', 'Swimming', 'Painting', 'Chess', 'Podcasts',
+    'Film', 'Rock Climbing', 'Coffee', 'Wine Tasting', 'Skiing', 'Football'
+  ];
+
+  var responsibilitiesList = {
+    'Executive': ['Setting company strategy', 'Board reporting', 'P&L ownership', 'Cross-functional alignment'],
+    'Engineering': ['Code review', 'System design', 'Sprint planning', 'Technical mentoring', 'Production support'],
+    'Product Development': ['Roadmap planning', 'User research', 'Feature prioritisation', 'Stakeholder alignment'],
+    'Commercial': ['Revenue targets', 'Client relationships', 'Pipeline management', 'Contract negotiation'],
+    'Consulting': ['Client delivery', 'Solution design', 'Project scoping', 'Team utilisation'],
+    'Customer Success': ['Account health', 'Onboarding', 'Retention strategy', 'Escalation handling'],
+    'Marketing': ['Campaign execution', 'Brand management', 'Content strategy', 'Analytics reporting'],
+    'Finance': ['Financial reporting', 'Budget management', 'Forecasting', 'Audit preparation'],
+    'Risk': ['Risk assessment', 'Policy development', 'Regulatory compliance', 'Incident response'],
+    'Supplier': ['Vendor evaluation', 'Contract management', 'Cost optimisation', 'SLA monitoring'],
+    'Information Security': ['Threat monitoring', 'Security audits', 'Policy enforcement', 'Incident response'],
+    'IT Support': ['Service desk management', 'System maintenance', 'User provisioning', 'Asset management'],
+    'Infrastructure': ['Capacity planning', 'Network management', 'Cloud operations', 'Disaster recovery']
+  };
+
+  var aboutMeTemplates = [
+    'Passionate about {interest1} and {interest2}. {years}+ years in {field} with a focus on delivering results.',
+    'Experienced {field} professional who enjoys {interest1} outside of work. Always looking to learn and grow.',
+    'Dedicated team player with a background in {field}. Outside the office, you\'ll find me {interest1} or {interest2}.',
+    'Driven by curiosity and a love for {field}. When not working, I enjoy {interest1} and {interest2}.',
+    '{years}+ years of experience in {field}. I believe in collaboration, continuous improvement, and {interest1}.'
+  ];
+
+  var cityByOffice = {
+    'UK': ['London', 'Belfast'],
+    'US': ['Chicago', 'New York'],
+    'China': ['Shanghai'],
+    'Singapore': ['Singapore'],
+    'Malaysia': ['Kuala Lumpur'],
+    'Australia': ['Sydney', 'Melbourne'],
+    'Northern Ireland': ['Belfast'],
+    'Canada': ['Toronto'],
+    'Brazil': ['Sao Paulo'],
+    'Germany': ['Dusseldorf'],
+    'Japan': ['Tokyo'],
+    'South Korea': ['Seoul'],
+    'India': ['Mumbai', 'Bangalore']
+  };
+
   var users = [];
   var nextId = 1;
   var now = new Date();
@@ -152,6 +210,20 @@ WhosWho.generateMockData = function () {
   function addUser(parentId, name, title, dept, office) {
     var id = String(nextId++);
     var email = name.toLowerCase().replace(/[^a-z ]/g, '').replace(/ /g, '.') + '@mintelgroup.com';
+    var cities = cityByOffice[office] || [office];
+    var city = pick(cities);
+    var phoneArea = Math.floor(100 + rand() * 900);
+    var phoneLine = Math.floor(1000 + rand() * 9000);
+    var years = Math.floor(2 + rand() * 18);
+    var mySkills = pickN(skillsList, 3 + Math.floor(rand() * 4));
+    var myInterests = pickN(interestsList, 2 + Math.floor(rand() * 3));
+    var myResps = responsibilitiesList[dept] || responsibilitiesList['Engineering'];
+    var aboutTpl = pick(aboutMeTemplates);
+    var aboutMe = aboutTpl
+      .replace('{interest1}', myInterests[0] ? myInterests[0].toLowerCase() : 'learning')
+      .replace('{interest2}', myInterests[1] ? myInterests[1].toLowerCase() : 'teamwork')
+      .replace('{years}', String(years))
+      .replace('{field}', dept);
     users.push({
       id: id,
       parentId: parentId,
@@ -160,7 +232,15 @@ WhosWho.generateMockData = function () {
       department: dept,
       mail: email,
       officeLocation: office,
+      city: city,
+      country: office,
+      businessPhones: ['+' + phoneArea + ' ' + phoneLine + ' ' + Math.floor(1000 + rand() * 9000)],
+      mobilePhone: '+' + phoneArea + ' ' + phoneLine + ' ' + Math.floor(1000 + rand() * 9000),
       startDate: randomStartDate(),
+      aboutMe: aboutMe,
+      skills: mySkills,
+      interests: myInterests,
+      responsibilities: pickN(myResps, 2 + Math.floor(rand() * 2)),
       photo: null
     });
     return id;

@@ -344,7 +344,25 @@ body {
   margin: 0 auto;
 }
 
-/* ---- Card ---- */
+/* ---- Card flip wrapper ---- */
+
+.org-card-flip {
+  width: 260px;
+  perspective: 800px;
+  position: relative;
+}
+
+.org-card-flip.flipped .org-card-inner {
+  transform: rotateY(180deg);
+}
+
+.org-card-inner {
+  position: relative;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+/* ---- Card (front) ---- */
 
 .org-card {
   display: flex;
@@ -355,10 +373,12 @@ body {
   border: 2px solid #e1e1e1;
   border-radius: 8px;
   width: 260px;
-  cursor: default;
+  cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   position: relative;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .org-card:hover {
@@ -369,6 +389,91 @@ body {
   border-color: #0078d4;
   background-color: #f0f6ff;
   box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
+}
+
+/* ---- Card back ---- */
+
+.org-card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260px;
+  background: #ffffff;
+  border: 2px solid #0078d4;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  cursor: pointer;
+  overflow-y: auto;
+  max-height: 340px;
+}
+
+.org-card-back-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #323130;
+  margin-bottom: 2px;
+}
+
+.org-card-back-title {
+  font-size: 12px;
+  color: #0078d4;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.org-card-back-section {
+  margin-bottom: 8px;
+}
+
+.org-card-back-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8a8886;
+  margin-bottom: 2px;
+}
+
+.org-card-back-section-value {
+  font-size: 12px;
+  color: #323130;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.org-card-back-section-value a {
+  color: #0078d4;
+  text-decoration: none;
+}
+
+.org-card-back-section-value a:hover {
+  text-decoration: underline;
+}
+
+.org-card-back-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.org-card-back-tag {
+  display: inline-block;
+  background: #f0f6ff;
+  color: #0078d4;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.org-card-back-divider {
+  border: none;
+  border-top: 1px solid #edebe9;
+  margin: 8px 0;
 }
 
 /* ---- Avatar (shared) ---- */
@@ -1025,6 +1130,64 @@ WhosWho.generateMockData = function () {
     'Infrastructure': ['Systems Engineer', 'Cloud Engineer', 'Network Engineer', 'Site Reliability Engineer', 'Database Administrator', 'Platform Engineer']
   };
 
+  var skillsList = [
+    'Leadership', 'Strategic Planning', 'Agile', 'Scrum', 'Project Management',
+    'Data Analysis', 'Machine Learning', 'Python', 'JavaScript', 'TypeScript',
+    'React', 'Angular', 'Node.js', 'SQL', 'Cloud Architecture', 'AWS', 'Azure',
+    'DevOps', 'CI/CD', 'Docker', 'Kubernetes', 'Microservices', 'REST APIs',
+    'Communication', 'Stakeholder Management', 'Budgeting', 'Negotiation',
+    'UX Design', 'Product Strategy', 'Market Research', 'Sales Strategy',
+    'Risk Assessment', 'Compliance', 'Financial Modelling', 'Cybersecurity',
+    'Networking', 'System Administration', 'Technical Writing', 'Mentoring'
+  ];
+
+  var interestsList = [
+    'Running', 'Photography', 'Cooking', 'Reading', 'Travel', 'Hiking',
+    'Music', 'Cycling', 'Yoga', 'Gaming', 'Gardening', 'Volunteering',
+    'Board Games', 'Tennis', 'Swimming', 'Painting', 'Chess', 'Podcasts',
+    'Film', 'Rock Climbing', 'Coffee', 'Wine Tasting', 'Skiing', 'Football'
+  ];
+
+  var responsibilitiesList = {
+    'Executive': ['Setting company strategy', 'Board reporting', 'P&L ownership', 'Cross-functional alignment'],
+    'Engineering': ['Code review', 'System design', 'Sprint planning', 'Technical mentoring', 'Production support'],
+    'Product Development': ['Roadmap planning', 'User research', 'Feature prioritisation', 'Stakeholder alignment'],
+    'Commercial': ['Revenue targets', 'Client relationships', 'Pipeline management', 'Contract negotiation'],
+    'Consulting': ['Client delivery', 'Solution design', 'Project scoping', 'Team utilisation'],
+    'Customer Success': ['Account health', 'Onboarding', 'Retention strategy', 'Escalation handling'],
+    'Marketing': ['Campaign execution', 'Brand management', 'Content strategy', 'Analytics reporting'],
+    'Finance': ['Financial reporting', 'Budget management', 'Forecasting', 'Audit preparation'],
+    'Risk': ['Risk assessment', 'Policy development', 'Regulatory compliance', 'Incident response'],
+    'Supplier': ['Vendor evaluation', 'Contract management', 'Cost optimisation', 'SLA monitoring'],
+    'Information Security': ['Threat monitoring', 'Security audits', 'Policy enforcement', 'Incident response'],
+    'IT Support': ['Service desk management', 'System maintenance', 'User provisioning', 'Asset management'],
+    'Infrastructure': ['Capacity planning', 'Network management', 'Cloud operations', 'Disaster recovery']
+  };
+
+  var aboutMeTemplates = [
+    'Passionate about {interest1} and {interest2}. {years}+ years in {field} with a focus on delivering results.',
+    'Experienced {field} professional who enjoys {interest1} outside of work. Always looking to learn and grow.',
+    'Dedicated team player with a background in {field}. Outside the office, you\'ll find me {interest1} or {interest2}.',
+    'Driven by curiosity and a love for {field}. When not working, I enjoy {interest1} and {interest2}.',
+    '{years}+ years of experience in {field}. I believe in collaboration, continuous improvement, and {interest1}.'
+  ];
+
+  var cityByOffice = {
+    'UK': ['London', 'Belfast'],
+    'US': ['Chicago', 'New York'],
+    'China': ['Shanghai'],
+    'Singapore': ['Singapore'],
+    'Malaysia': ['Kuala Lumpur'],
+    'Australia': ['Sydney', 'Melbourne'],
+    'Northern Ireland': ['Belfast'],
+    'Canada': ['Toronto'],
+    'Brazil': ['Sao Paulo'],
+    'Germany': ['Dusseldorf'],
+    'Japan': ['Tokyo'],
+    'South Korea': ['Seoul'],
+    'India': ['Mumbai', 'Bangalore']
+  };
+
   var users = [];
   var nextId = 1;
   var now = new Date();
@@ -1049,6 +1212,20 @@ WhosWho.generateMockData = function () {
   function addUser(parentId, name, title, dept, office) {
     var id = String(nextId++);
     var email = name.toLowerCase().replace(/[^a-z ]/g, '').replace(/ /g, '.') + '@mintelgroup.com';
+    var cities = cityByOffice[office] || [office];
+    var city = pick(cities);
+    var phoneArea = Math.floor(100 + rand() * 900);
+    var phoneLine = Math.floor(1000 + rand() * 9000);
+    var years = Math.floor(2 + rand() * 18);
+    var mySkills = pickN(skillsList, 3 + Math.floor(rand() * 4));
+    var myInterests = pickN(interestsList, 2 + Math.floor(rand() * 3));
+    var myResps = responsibilitiesList[dept] || responsibilitiesList['Engineering'];
+    var aboutTpl = pick(aboutMeTemplates);
+    var aboutMe = aboutTpl
+      .replace('{interest1}', myInterests[0] ? myInterests[0].toLowerCase() : 'learning')
+      .replace('{interest2}', myInterests[1] ? myInterests[1].toLowerCase() : 'teamwork')
+      .replace('{years}', String(years))
+      .replace('{field}', dept);
     users.push({
       id: id,
       parentId: parentId,
@@ -1057,7 +1234,15 @@ WhosWho.generateMockData = function () {
       department: dept,
       mail: email,
       officeLocation: office,
+      city: city,
+      country: office,
+      businessPhones: ['+' + phoneArea + ' ' + phoneLine + ' ' + Math.floor(1000 + rand() * 9000)],
+      mobilePhone: '+' + phoneArea + ' ' + phoneLine + ' ' + Math.floor(1000 + rand() * 9000),
       startDate: randomStartDate(),
+      aboutMe: aboutMe,
+      skills: mySkills,
+      interests: myInterests,
+      responsibilities: pickN(myResps, 2 + Math.floor(rand() * 2)),
       photo: null
     });
     return id;
@@ -1364,11 +1549,37 @@ WhosWho.ChartRenderer = {
     var self = this;
     var wrapper = document.createElement('div');
     wrapper.className = 'org-node-wrapper';
+
+    // Flip container
+    var flipEl = document.createElement('div');
+    flipEl.className = 'org-card-flip';
+    flipEl.setAttribute('data-id', node.data.id);
+    var inner = document.createElement('div');
+    inner.className = 'org-card-inner';
+
+    // Front
     var card = document.createElement('div');
     card.className = 'org-card';
     if (node.data.id === this._highlightedId) card.classList.add('org-card--highlighted');
-    card.setAttribute('data-id', node.data.id);
     card.innerHTML = this._cardHtml(node.data, node.children.length);
+
+    // Back
+    var back = document.createElement('div');
+    back.className = 'org-card-back';
+    var managerName = this._getManagerName(node.data.parentId);
+    back.innerHTML = this._cardBackHtml(node.data, managerName);
+
+    inner.appendChild(card);
+    inner.appendChild(back);
+    flipEl.appendChild(inner);
+
+    // Flip on card click (not on toggle button)
+    card.addEventListener('click', function () {
+      flipEl.classList.add('flipped');
+    });
+    back.addEventListener('click', function () {
+      flipEl.classList.remove('flipped');
+    });
 
     if (node.children.length > 0) {
       var toggleBtn = card.querySelector('.org-toggle');
@@ -1380,7 +1591,7 @@ WhosWho.ChartRenderer = {
         });
       }
     }
-    wrapper.appendChild(card);
+    wrapper.appendChild(flipEl);
 
     if (node.children.length > 0 && !this._collapsed[node.data.id]) {
       var childrenContainer = document.createElement('div');
@@ -1415,6 +1626,65 @@ WhosWho.ChartRenderer = {
         '<div class="org-card-title">' + (node.jobTitle || '') + '</div>' +
         metaHtml +
       '</div>' + toggleHtml;
+  },
+
+  _getManagerName: function (parentId) {
+    if (!parentId || !this._data) return null;
+    for (var i = 0; i < this._data.length; i++) {
+      if (this._data[i].id === parentId) return this._data[i].displayName;
+    }
+    return null;
+  },
+
+  _escHtml: function (str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  },
+
+  _cardBackHtml: function (node, managerName) {
+    var self = this;
+    var h = '';
+    h += '<div class="org-card-back-name">' + self._escHtml(node.displayName) + '</div>';
+    h += '<div class="org-card-back-title">' + self._escHtml(node.jobTitle || '') + '</div>';
+    h += '<hr class="org-card-back-divider">';
+
+    function section(label, value) {
+      if (!value) return '';
+      return '<div class="org-card-back-section">' +
+        '<div class="org-card-back-section-label">' + label + '</div>' +
+        '<div class="org-card-back-section-value">' + value + '</div></div>';
+    }
+
+    function tagSection(label, items) {
+      if (!items || !items.length) return '';
+      var tags = '';
+      for (var i = 0; i < items.length; i++) tags += '<span class="org-card-back-tag">' + self._escHtml(items[i]) + '</span>';
+      return '<div class="org-card-back-section">' +
+        '<div class="org-card-back-section-label">' + label + '</div>' +
+        '<div class="org-card-back-tags">' + tags + '</div></div>';
+    }
+
+    // Contact
+    h += section('Department', self._escHtml(node.department || ''));
+    h += section('Office', self._escHtml((node.city ? node.city + ', ' : '') + (node.country || node.officeLocation || '')));
+    h += section('Email', node.mail ? '<a href="mailto:' + self._escHtml(node.mail) + '">' + self._escHtml(node.mail) + '</a>' : '');
+
+    var phones = [];
+    if (node.businessPhones && node.businessPhones.length) phones.push(self._escHtml(node.businessPhones[0]));
+    if (node.mobilePhone) phones.push(self._escHtml(node.mobilePhone) + ' (mobile)');
+    h += section('Phone', phones.join('<br>'));
+
+    h += section('Manager', managerName ? self._escHtml(managerName) : '&mdash;');
+    h += '<hr class="org-card-back-divider">';
+
+    // About
+    h += section('About', self._escHtml(node.aboutMe || ''));
+    h += tagSection('Skills', node.skills);
+    h += tagSection('Interests', node.interests);
+    h += tagSection('Responsibilities', node.responsibilities);
+
+    return h;
   },
 
   highlightAndCenter: function (userId) {
