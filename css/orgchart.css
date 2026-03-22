@@ -102,6 +102,10 @@
   position: relative;
 }
 
+.org-card-flip.flipped {
+  z-index: 10;
+}
+
 .org-card-flip.flipped .org-card-inner {
   transform: rotateY(180deg);
 }

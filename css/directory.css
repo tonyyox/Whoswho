@@ -160,6 +160,10 @@
   perspective: 800px;
 }
 
+.directory-card-flip.flipped {
+  z-index: 10;
+}
+
 .directory-card-flip.flipped .directory-card-inner {
   transform: rotateY(180deg);
 }
