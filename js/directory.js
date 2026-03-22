@@ -241,8 +241,30 @@ WhosWho.DirectoryController = {
     }
   },
 
+  _escHtml: function (str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  },
+
+  _getManagerName: function (parentId) {
+    if (!parentId) return null;
+    for (var i = 0; i < this._users.length; i++) {
+      if (this._users[i].id === parentId) return this._users[i].displayName;
+    }
+    return null;
+  },
+
   _createCard: function (user) {
     var self = this;
+
+    // Flip wrapper
+    var flip = document.createElement('div');
+    flip.className = 'directory-card-flip';
+    var inner = document.createElement('div');
+    inner.className = 'directory-card-inner';
+
+    // ---- FRONT ----
     var card = document.createElement('div');
     card.className = 'directory-card';
 
@@ -281,7 +303,7 @@ WhosWho.DirectoryController = {
       body.appendChild(detailEl);
     }
 
-    // Footer with action + depth badge
+    // Footer with action
     var footer = document.createElement('div');
     footer.className = 'directory-card-footer';
 
@@ -289,13 +311,91 @@ WhosWho.DirectoryController = {
     actionBtn.type = 'button';
     actionBtn.className = 'directory-card-action';
     actionBtn.textContent = 'View in Org Chart \u2192';
-    actionBtn.addEventListener('click', function () {
+    actionBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
       self._onViewInChart(user.id);
     });
     footer.appendChild(actionBtn);
 
     body.appendChild(footer);
     card.appendChild(body);
-    return card;
+
+    // ---- BACK ----
+    var back = document.createElement('div');
+    back.className = 'directory-card-back';
+    var managerName = this._getManagerName(user.parentId);
+    back.innerHTML = this._cardBackHtml(user, managerName);
+
+    inner.appendChild(card);
+    inner.appendChild(back);
+    flip.appendChild(inner);
+
+    // Flip on click
+    card.addEventListener('click', function () {
+      flip.classList.add('flipped');
+    });
+    back.addEventListener('click', function () {
+      flip.classList.remove('flipped');
+    });
+    // Don't flip when clicking links/buttons on back
+    back.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+      flip.classList.remove('flipped');
+    });
+
+    return flip;
+  },
+
+  _cardBackHtml: function (node, managerName) {
+    var self = this;
+    var h = '';
+
+    // Avatar + name header
+    var initials = node.displayName.split(' ').map(function (n) { return n[0]; }).join('').substring(0, 2).toUpperCase();
+    var avatarHtml = node.photo
+      ? '<img class="org-avatar-img" src="' + node.photo + '" alt="" />'
+      : '<span>' + initials + '</span>';
+    h += '<div class="directory-back-header">';
+    h += '<div class="org-avatar">' + avatarHtml + '</div>';
+    h += '<div><div class="org-card-back-name">' + self._escHtml(node.displayName) + '</div>';
+    h += '<div class="org-card-back-title">' + self._escHtml(node.jobTitle || '') + '</div></div>';
+    h += '</div>';
+    h += '<hr class="org-card-back-divider">';
+
+    function section(label, value) {
+      if (!value) return '';
+      return '<div class="org-card-back-section">' +
+        '<div class="org-card-back-section-label">' + label + '</div>' +
+        '<div class="org-card-back-section-value">' + value + '</div></div>';
+    }
+
+    function tagSection(label, items) {
+      if (!items || !items.length) return '';
+      var tags = '';
+      for (var i = 0; i < items.length; i++) tags += '<span class="org-card-back-tag">' + self._escHtml(items[i]) + '</span>';
+      return '<div class="org-card-back-section">' +
+        '<div class="org-card-back-section-label">' + label + '</div>' +
+        '<div class="org-card-back-tags">' + tags + '</div></div>';
+    }
+
+    h += section('Department', self._escHtml(node.department || ''));
+    h += section('Office', self._escHtml((node.city ? node.city + ', ' : '') + (node.country || node.officeLocation || '')));
+    h += section('Email', node.mail ? '<a href="mailto:' + self._escHtml(node.mail) + '">' + self._escHtml(node.mail) + '</a>' : '');
+
+    var phones = [];
+    if (node.businessPhones && node.businessPhones.length) phones.push(self._escHtml(node.businessPhones[0]));
+    if (node.mobilePhone) phones.push(self._escHtml(node.mobilePhone) + ' (mobile)');
+    h += section('Phone', phones.join('<br>'));
+
+    h += section('Manager', managerName ? self._escHtml(managerName) : '&mdash;');
+    h += '<hr class="org-card-back-divider">';
+
+    h += section('Job Description', self._escHtml(node.jobDescription || ''));
+    h += section('About', self._escHtml(node.aboutMe || ''));
+    h += tagSection('Skills', node.skills);
+    h += tagSection('Interests', node.interests);
+    h += tagSection('Responsibilities', node.responsibilities);
+
+    return h;
   }
 };

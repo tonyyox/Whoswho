@@ -180,7 +180,8 @@ WhosWho.ChartRenderer = {
     h += section('Manager', managerName ? self._escHtml(managerName) : '&mdash;');
     h += '<hr class="org-card-back-divider">';
 
-    // About
+    // Role
+    h += section('Job Description', self._escHtml(node.jobDescription || ''));
     h += section('About', self._escHtml(node.aboutMe || ''));
     h += tagSection('Skills', node.skills);
     h += tagSection('Interests', node.interests);

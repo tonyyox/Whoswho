@@ -162,6 +162,74 @@ WhosWho.generateMockData = function () {
     'Infrastructure': ['Capacity planning', 'Network management', 'Cloud operations', 'Disaster recovery']
   };
 
+  var jobDescriptions = {
+    'Executive': [
+      'Provide strategic leadership and direction across the organisation, driving growth, operational excellence, and stakeholder engagement.',
+      'Oversee cross-functional initiatives, set organisational priorities, and ensure alignment between business units and company vision.',
+      'Lead executive decision-making, manage board relations, and champion culture, talent development, and long-term planning.'
+    ],
+    'Engineering': [
+      'Design, develop, and maintain scalable software systems. Participate in code reviews, architecture discussions, and agile ceremonies.',
+      'Build and ship high-quality features across the stack. Collaborate with product and design to deliver user-facing improvements.',
+      'Own technical components end-to-end, from requirements through deployment. Drive engineering best practices and mentor junior engineers.'
+    ],
+    'Product Development': [
+      'Define product strategy and roadmap based on user research, market analysis, and business goals. Prioritise features and manage backlogs.',
+      'Translate customer needs into clear requirements. Work closely with engineering and design to ship impactful product improvements.',
+      'Conduct user research, analyse product metrics, and iterate on designs to improve usability and drive adoption.'
+    ],
+    'Commercial': [
+      'Drive revenue growth by managing client relationships, developing new business opportunities, and closing enterprise deals.',
+      'Build and execute sales strategies, manage pipeline, and work cross-functionally to deliver value to key accounts.',
+      'Identify market opportunities, negotiate contracts, and ensure customer satisfaction to maximise lifetime value.'
+    ],
+    'Consulting': [
+      'Deliver client engagements from scoping through implementation. Provide expert advice and tailored solutions to complex business problems.',
+      'Lead project workstreams, manage client expectations, and ensure high-quality deliverables on time and within budget.',
+      'Develop proposals, conduct stakeholder workshops, and translate business requirements into actionable recommendations.'
+    ],
+    'Customer Success': [
+      'Ensure customers achieve their desired outcomes by providing proactive support, onboarding, and ongoing engagement.',
+      'Monitor account health, identify risks, and drive retention and expansion through strategic relationship management.',
+      'Act as the voice of the customer internally, channelling feedback to product and engineering teams to improve the platform.'
+    ],
+    'Marketing': [
+      'Plan and execute multi-channel marketing campaigns to drive brand awareness, lead generation, and customer engagement.',
+      'Create compelling content, manage social channels, and analyse campaign performance to optimise marketing spend.',
+      'Develop brand strategy, coordinate events, and collaborate with sales to ensure marketing efforts align with revenue goals.'
+    ],
+    'Finance': [
+      'Manage financial reporting, budgeting, and forecasting processes. Ensure accuracy, compliance, and timely delivery of financial data.',
+      'Support business decision-making through financial analysis, modelling, and scenario planning. Partner with department leads on budgets.',
+      'Oversee accounts payable/receivable, tax compliance, and audit preparation. Maintain internal controls and financial governance.'
+    ],
+    'Risk': [
+      'Identify, assess, and mitigate organisational risks across operational, regulatory, and strategic domains.',
+      'Develop and maintain risk frameworks, conduct audits, and ensure compliance with industry regulations and internal policies.',
+      'Monitor emerging threats, perform risk assessments, and advise leadership on risk mitigation strategies.'
+    ],
+    'Supplier': [
+      'Manage vendor relationships, negotiate contracts, and ensure suppliers meet quality, cost, and delivery requirements.',
+      'Evaluate and onboard new suppliers, monitor SLAs, and drive continuous improvement in procurement processes.',
+      'Optimise supply chain costs, manage procurement workflows, and ensure compliance with sourcing policies.'
+    ],
+    'Information Security': [
+      'Protect organisational assets by implementing security controls, monitoring threats, and responding to incidents.',
+      'Conduct security assessments, manage vulnerability programmes, and ensure compliance with security standards and regulations.',
+      'Develop security policies, run awareness training, and work with engineering to embed security into the development lifecycle.'
+    ],
+    'IT Support': [
+      'Provide technical support to end users, manage service desk operations, and ensure timely resolution of IT issues.',
+      'Maintain IT infrastructure, manage user provisioning, and support onboarding/offboarding processes.',
+      'Administer systems and applications, manage IT assets, and contribute to IT service improvement initiatives.'
+    ],
+    'Infrastructure': [
+      'Design, deploy, and maintain cloud and on-premises infrastructure to ensure high availability, performance, and security.',
+      'Manage CI/CD pipelines, monitor system health, and implement automation to improve operational efficiency.',
+      'Plan capacity, manage network infrastructure, and ensure disaster recovery and business continuity readiness.'
+    ]
+  };
+
   var aboutMeTemplates = [
     'Passionate about {interest1} and {interest2}. {years}+ years in {field} with a focus on delivering results.',
     'Experienced {field} professional who enjoys {interest1} outside of work. Always looking to learn and grow.',
@@ -218,6 +286,8 @@ WhosWho.generateMockData = function () {
     var mySkills = pickN(skillsList, 3 + Math.floor(rand() * 4));
     var myInterests = pickN(interestsList, 2 + Math.floor(rand() * 3));
     var myResps = responsibilitiesList[dept] || responsibilitiesList['Engineering'];
+    var deptDescs = jobDescriptions[dept] || jobDescriptions['Engineering'];
+    var jobDescription = pick(deptDescs);
     var aboutTpl = pick(aboutMeTemplates);
     var aboutMe = aboutTpl
       .replace('{interest1}', myInterests[0] ? myInterests[0].toLowerCase() : 'learning')
@@ -237,6 +307,7 @@ WhosWho.generateMockData = function () {
       businessPhones: ['+' + phoneArea + ' ' + phoneLine + ' ' + Math.floor(1000 + rand() * 9000)],
       mobilePhone: '+' + phoneArea + ' ' + phoneLine + ' ' + Math.floor(1000 + rand() * 9000),
       startDate: randomStartDate(),
+      jobDescription: jobDescription,
       aboutMe: aboutMe,
       skills: mySkills,
       interests: myInterests,
