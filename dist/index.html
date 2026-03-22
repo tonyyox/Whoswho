@@ -1344,7 +1344,7 @@ WhosWho.DirectoryController = {
   _filtered: [],
   _onViewInChart: null,
   _displayLimit: 100,
-  _filters: { query: '', offices: [], depth: null },
+  _filters: { query: '', offices: [], departments: [] },
 
   init: function (toolbarEl, gridWrapperEl, users, onViewInChart) {
     this._toolbarEl = toolbarEl;
@@ -1382,8 +1382,8 @@ WhosWho.DirectoryController = {
     // Office multi-select
     this._buildOfficeFilter();
 
-    // Depth filter
-    this._buildDepthFilter();
+    // Department multi-select
+    this._buildDepartmentFilter();
 
     // Result count
     this._countEl = document.createElement('span');
@@ -1448,32 +1448,60 @@ WhosWho.DirectoryController = {
     this._toolbarEl.appendChild(wrapper);
   },
 
-  _buildDepthFilter: function () {
+  _buildDepartmentFilter: function () {
     var self = this;
-    var maxDepth = WhosWho.DataUtils.getMaxDepth(this._users);
+    var departments = WhosWho.DataUtils.getUniqueDepartments(this._users);
 
-    var select = document.createElement('select');
-    select.className = 'directory-filter';
+    var wrapper = document.createElement('div');
+    wrapper.className = 'filter-multiselect';
 
-    var optAll = document.createElement('option');
-    optAll.value = '';
-    optAll.textContent = 'All Levels';
-    select.appendChild(optAll);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'filter-multiselect-btn';
+    btn.textContent = 'All Departments';
 
-    for (var d = 0; d <= maxDepth; d++) {
-      var opt = document.createElement('option');
-      opt.value = String(d);
-      opt.textContent = 'Level ' + (d + 1);
-      select.appendChild(opt);
+    var menu = document.createElement('div');
+    menu.className = 'filter-multiselect-menu';
+
+    for (var i = 0; i < departments.length; i++) {
+      (function (dept) {
+        var label = document.createElement('label');
+        label.className = 'filter-multiselect-option';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = dept;
+        cb.addEventListener('change', function () {
+          var selected = self._filters.departments;
+          if (cb.checked) {
+            selected.push(dept);
+          } else {
+            var idx = selected.indexOf(dept);
+            if (idx !== -1) selected.splice(idx, 1);
+          }
+          btn.textContent = selected.length === 0 ? 'All Departments' : selected.length + ' dept' + (selected.length > 1 ? 's' : '');
+          self._displayLimit = 100;
+          self._applyFilters();
+        });
+        var span = document.createElement('span');
+        span.textContent = dept;
+        label.appendChild(cb);
+        label.appendChild(span);
+        menu.appendChild(label);
+      })(departments[i]);
     }
 
-    select.addEventListener('change', function () {
-      self._filters.depth = select.value === '' ? null : parseInt(select.value, 10);
-      self._displayLimit = 100;
-      self._applyFilters();
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('visible');
     });
 
-    this._toolbarEl.appendChild(select);
+    document.addEventListener('click', function (e) {
+      if (!wrapper.contains(e.target)) menu.classList.remove('visible');
+    });
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(menu);
+    this._toolbarEl.appendChild(wrapper);
   },
 
   _applyFilters: function () {
@@ -1492,10 +1520,11 @@ WhosWho.DirectoryController = {
       results = results.filter(function (u) { return officeSet[u.officeLocation]; });
     }
 
-    // Depth filter
-    if (this._filters.depth !== null) {
-      var depth = this._filters.depth;
-      results = results.filter(function (u) { return u._depth === depth; });
+    // Department filter
+    if (this._filters.departments.length > 0) {
+      var deptSet = {};
+      for (var j = 0; j < this._filters.departments.length; j++) deptSet[this._filters.departments[j]] = true;
+      results = results.filter(function (u) { return deptSet[u.department]; });
     }
 
     this._filtered = results;
@@ -1599,13 +1628,6 @@ WhosWho.DirectoryController = {
       self._onViewInChart(user.id);
     });
     footer.appendChild(actionBtn);
-
-    if (typeof user._depth === 'number') {
-      var badge = document.createElement('span');
-      badge.className = 'depth-badge';
-      badge.textContent = 'Level ' + (user._depth + 1);
-      footer.appendChild(badge);
-    }
 
     body.appendChild(footer);
     card.appendChild(body);
