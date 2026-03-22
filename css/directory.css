@@ -1,0 +1,270 @@
+/* Who's Who - Directory View Styles */
+
+/* ---- Toolbar ---- */
+
+.directory-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #edebe9;
+  flex-wrap: wrap;
+  background: #faf9f8;
+  flex-shrink: 0;
+}
+
+.directory-search {
+  width: 260px;
+  padding: 7px 12px 7px 34px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%238a8886' d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.directory-search:focus {
+  border-color: #0078d4;
+}
+
+.directory-search::placeholder {
+  color: #a19f9d;
+}
+
+/* ---- Filter select (native) ---- */
+
+.directory-filter {
+  padding: 7px 12px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.directory-filter:focus {
+  border-color: #0078d4;
+}
+
+/* ---- Multi-select dropdown ---- */
+
+.filter-multiselect {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-multiselect-btn {
+  padding: 7px 28px 7px 12px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.filter-multiselect-btn::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #605e5c;
+}
+
+.filter-multiselect-btn:focus {
+  border-color: #0078d4;
+}
+
+.filter-multiselect-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  background: #ffffff;
+  border: 1px solid #edebe9;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 200;
+  max-height: 260px;
+  overflow-y: auto;
+  min-width: 180px;
+  padding: 4px 0;
+}
+
+.filter-multiselect-menu.visible {
+  display: block;
+}
+
+.filter-multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #323130;
+  transition: background-color 0.1s;
+}
+
+.filter-multiselect-option:hover {
+  background-color: #f3f2f1;
+}
+
+.filter-multiselect-option input[type="checkbox"] {
+  margin: 0;
+  accent-color: #0078d4;
+}
+
+/* ---- Result count ---- */
+
+.directory-result-count {
+  font-size: 13px;
+  color: #605e5c;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ---- Grid ---- */
+
+.directory-grid-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+/* ---- Card ---- */
+
+.directory-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.directory-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d2d0ce;
+}
+
+.directory-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.directory-card-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #323130;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-card-title {
+  font-size: 12px;
+  color: #605e5c;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-card-detail {
+  font-size: 11px;
+  color: #8a8886;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.directory-card-action {
+  border: none;
+  background: none;
+  color: #0078d4;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.directory-card-action:hover {
+  text-decoration: underline;
+}
+
+.depth-badge {
+  display: inline-block;
+  font-size: 10px;
+  background: #f0f6ff;
+  color: #0078d4;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* ---- Empty / Show more ---- */
+
+.directory-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #8a8886;
+  font-size: 14px;
+}
+
+.directory-show-more {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 12px;
+}
+
+.directory-show-more-btn {
+  padding: 8px 24px;
+  background: #f3f2f1;
+  border: 1px solid #d2d0ce;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.directory-show-more-btn:hover {
+  background: #edebe9;
+}

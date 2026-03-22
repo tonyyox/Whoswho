@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Who's Who - Org Chart</title>
+  <style>
+/* Who's Who - Base Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #323130;
+  background: #faf9f8;
+}
+
+/* ---- Layout ---- */
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #edebe9;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #323130;
+}
+
+/* ---- View Tabs ---- */
+
+.view-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: 24px;
+}
+
+.view-tab {
+  padding: 6px 16px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: #605e5c;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  border-radius: 4px 4px 0 0;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.view-tab:hover {
+  color: #323130;
+  background-color: #f3f2f1;
+}
+
+.view-tab--active {
+  color: #0078d4;
+  border-bottom-color: #0078d4;
+  font-weight: 600;
+}
+
+/* ---- View Container ---- */
+
+.view-container {
+  width: 100%;
+  height: calc(100vh - 58px);
+  position: relative;
+}
+
+.view {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.view--active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Header Search ---- */
+
+.search-container {
+  position: relative;
+  margin-left: auto;
+}
+
+.search-input {
+  width: 280px;
+  padding: 7px 12px 7px 34px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%238a8886' d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #0078d4;
+}
+
+.search-input::placeholder {
+  color: #a19f9d;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #edebe9;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 2px;
+  display: none;
+}
+
+.search-results.visible {
+  display: block;
+}
+
+.search-result-item {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f2f1;
+  font-family: inherit;
+}
+
+.search-result-item:hover {
+  background-color: #f3f2f1;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #323130;
+}
+
+.search-result-detail {
+  font-size: 12px;
+  color: #605e5c;
+  margin-top: 2px;
+}
+
+/* ---- Loading overlay ---- */
+
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #edebe9;
+  border-top-color: #0078d4;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #605e5c;
+}
+
+/* ---- Error ---- */
+
+.error-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 12px;
+  padding: 20px;
+}
+
+.error-container.visible {
+  display: flex;
+}
+
+.error-message {
+  font-size: 14px;
+  color: #a4262c;
+  text-align: center;
+  max-width: 500px;
+}
+
+.retry-button {
+  padding: 8px 20px;
+  background: #0078d4;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-button:hover {
+  background: #106ebe;
+}
+/* Who's Who - Org Chart Styles */
+
+.chart-container {
+  width: 100%;
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+/* ---- Org Tree ---- */
+
+.org-viewport {
+  min-width: 100%;
+  min-height: 100%;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.org-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.org-node-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.org-children {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 24px;
+  position: relative;
+}
+
+/* Connector lines */
+.org-children::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 24px;
+  border-left: 2px solid #d2d0ce;
+}
+
+.org-children > .org-node-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 0;
+  height: 24px;
+  border-left: 2px solid #d2d0ce;
+}
+
+.org-children > .org-node-wrapper:not(:only-child)::after {
+  content: '';
+  position: absolute;
+  top: -24px;
+  height: 0;
+  border-top: 2px solid #d2d0ce;
+}
+
+.org-children > .org-node-wrapper:first-child:not(:only-child)::after {
+  left: 50%;
+  width: calc(50% + 8px);
+}
+
+.org-children > .org-node-wrapper:last-child:not(:only-child)::after {
+  left: auto;
+  right: 50%;
+  width: calc(50% + 8px);
+}
+
+.org-children > .org-node-wrapper:not(:first-child):not(:last-child)::after {
+  left: -8px;
+  right: -8px;
+  width: calc(100% + 16px);
+}
+
+.org-node-wrapper:has(> .org-children)::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 24px;
+  border-left: 2px solid #d2d0ce;
+  margin: 0 auto;
+}
+
+/* ---- Card ---- */
+
+.org-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  width: 260px;
+  cursor: default;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.org-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.org-card--highlighted {
+  border-color: #0078d4;
+  background-color: #f0f6ff;
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
+}
+
+/* ---- Avatar (shared) ---- */
+
+.org-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0078d4, #106ebe);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.org-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- Card info ---- */
+
+.org-card-info {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.org-card-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #323130;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.org-card-title {
+  font-size: 12px;
+  color: #605e5c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.org-card-meta {
+  font-size: 11px;
+  color: #8a8886;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Toggle button ---- */
+
+.org-toggle {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid #d2d0ce;
+  border-radius: 12px;
+  padding: 1px 8px;
+  font-size: 11px;
+  color: #605e5c;
+  cursor: pointer;
+  z-index: 1;
+  white-space: nowrap;
+  line-height: 18px;
+}
+
+.org-toggle:hover {
+  background: #f3f2f1;
+  border-color: #8a8886;
+}
+/* Who's Who - Directory View Styles */
+
+/* ---- Toolbar ---- */
+
+.directory-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #edebe9;
+  flex-wrap: wrap;
+  background: #faf9f8;
+  flex-shrink: 0;
+}
+
+.directory-search {
+  width: 260px;
+  padding: 7px 12px 7px 34px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%238a8886' d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.directory-search:focus {
+  border-color: #0078d4;
+}
+
+.directory-search::placeholder {
+  color: #a19f9d;
+}
+
+/* ---- Filter select (native) ---- */
+
+.directory-filter {
+  padding: 7px 12px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.directory-filter:focus {
+  border-color: #0078d4;
+}
+
+/* ---- Multi-select dropdown ---- */
+
+.filter-multiselect {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-multiselect-btn {
+  padding: 7px 28px 7px 12px;
+  border: 1px solid #8a8886;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  background: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.filter-multiselect-btn::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #605e5c;
+}
+
+.filter-multiselect-btn:focus {
+  border-color: #0078d4;
+}
+
+.filter-multiselect-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  background: #ffffff;
+  border: 1px solid #edebe9;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 200;
+  max-height: 260px;
+  overflow-y: auto;
+  min-width: 180px;
+  padding: 4px 0;
+}
+
+.filter-multiselect-menu.visible {
+  display: block;
+}
+
+.filter-multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #323130;
+  transition: background-color 0.1s;
+}
+
+.filter-multiselect-option:hover {
+  background-color: #f3f2f1;
+}
+
+.filter-multiselect-option input[type="checkbox"] {
+  margin: 0;
+  accent-color: #0078d4;
+}
+
+/* ---- Result count ---- */
+
+.directory-result-count {
+  font-size: 13px;
+  color: #605e5c;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ---- Grid ---- */
+
+.directory-grid-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+/* ---- Card ---- */
+
+.directory-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.directory-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d2d0ce;
+}
+
+.directory-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.directory-card-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #323130;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-card-title {
+  font-size: 12px;
+  color: #605e5c;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-card-detail {
+  font-size: 11px;
+  color: #8a8886;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.directory-card-action {
+  border: none;
+  background: none;
+  color: #0078d4;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.directory-card-action:hover {
+  text-decoration: underline;
+}
+
+.depth-badge {
+  display: inline-block;
+  font-size: 10px;
+  background: #f0f6ff;
+  color: #0078d4;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* ---- Empty / Show more ---- */
+
+.directory-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #8a8886;
+  font-size: 14px;
+}
+
+.directory-show-more {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 12px;
+}
+
+.directory-show-more-btn {
+  padding: 8px 24px;
+  background: #f3f2f1;
+  border: 1px solid #d2d0ce;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #323130;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.directory-show-more-btn:hover {
+  background: #edebe9;
+}
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1 class="title">Who's Who</h1>
+      <nav class="view-tabs">
+        <button class="view-tab view-tab--active" data-view="chart">Org Chart</button>
+        <button class="view-tab" data-view="directory">Directory</button>
+      </nav>
+      <div class="search-container">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search by name, title, or department..."
+          autocomplete="off"
+        >
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </header>
+
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Loading directory...</div>
+    </div>
+
+    <div id="error-container" class="error-container">
+      <div id="error-message" class="error-message"></div>
+      <button id="retry-button" class="retry-button">Try Again</button>
+    </div>
+
+    <div class="view-container">
+      <section id="chart-view" class="view view--active">
+        <div id="chart-container" class="chart-container"></div>
+      </section>
+      <section id="directory-view" class="view">
+        <div id="directory-toolbar" class="directory-toolbar"></div>
+        <div id="directory-grid-wrapper" class="directory-grid-wrapper"></div>
+      </section>
+    </div>
+  </div>
+  <script>
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.CONFIG = {
+  // Set to true to test locally with mock data (no SharePoint needed).
+  // Set to false when deployed to a SharePoint document library.
+  useMockData: true,
+
+  // Override if auto-detection fails. Leave blank for auto-detect.
+  // Example: 'https://mintelgroup.sharepoint.com/sites/MySite'
+  siteUrl: '',
+
+  // SharePoint Search People result source ID
+  peopleSourceId: 'b09a7990-05ea-4af9-81ef-edfab16c4e31',
+
+  // How many users to fetch per page
+  pageSize: 500,
+
+  // How many manager lookups to run in parallel
+  managerBatchSize: 8
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.generateMockData = function () {
+  // Deterministic pseudo-random (mulberry32)
+  var _seed = 12345;
+  function rand() {
+    _seed |= 0; _seed = _seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(_seed ^ _seed >>> 15, 1 | _seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  function pick(arr) { return arr[Math.floor(rand() * arr.length)]; }
+  function pickN(arr, n) {
+    var copy = arr.slice(), out = [];
+    for (var i = 0; i < n && copy.length; i++) {
+      var idx = Math.floor(rand() * copy.length);
+      out.push(copy.splice(idx, 1)[0]);
+    }
+    return out;
+  }
+
+  var firstNames = [
+    'James','Mary','Robert','Patricia','John','Jennifer','Michael','Linda','David','Elizabeth',
+    'William','Barbara','Richard','Susan','Joseph','Jessica','Thomas','Sarah','Charles','Karen',
+    'Christopher','Lisa','Daniel','Nancy','Matthew','Betty','Anthony','Margaret','Mark','Sandra',
+    'Andrew','Ashley','Steven','Emily','Paul','Donna','Joshua','Michelle','Kenneth','Carol',
+    'Wei','Yuki','Raj','Priya','Hiroshi','Mei','Arjun','Fatima','Jin','Soo',
+    'Carlos','Ana','Pedro','Lucia','Diego','Isabella','Marco','Sofia','Liam','Olivia',
+    'Ethan','Ava','Noah','Mia','Lucas','Aisha','Omar','Yuna','Kenji','Sakura',
+    'Ravi','Deepa','Vikram','Ananya','Sanjay','Kavita','Amit','Nisha','Suresh','Lakshmi',
+    'Connor','Siobhan','Declan','Aoife','Padraig','Ciara','Sean','Niamh','Callum','Freya',
+    'Hans','Ingrid','Klaus','Greta','Lars','Hana','Tomoko','Akira','Yuto','Haruki'
+  ];
+
+  var lastNames = [
+    'Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez',
+    'Hernandez','Lopez','Wilson','Anderson','Thomas','Taylor','Moore','Jackson','Martin','Lee',
+    'Chen','Wang','Li','Zhang','Liu','Yang','Huang','Wu','Zhou','Xu',
+    'Kim','Park','Choi','Jung','Kang','Cho','Yoon','Jang','Lim','Han',
+    'Tanaka','Suzuki','Watanabe','Sato','Yamamoto','Nakamura','Kobayashi','Takahashi','Ito','Saito',
+    'Patel','Sharma','Singh','Kumar','Gupta','Verma','Mehta','Shah','Rao','Das',
+    'Silva','Santos','Oliveira','Ferreira','Costa','Pereira','Almeida','Ribeiro','Carvalho','Gomes',
+    'Mueller','Schmidt','Schneider','Fischer','Weber','Meyer','Wagner','Becker','Schulz','Hoffmann',
+    'Murphy','Kelly','OBrien','Ryan','Sullivan','Walsh','Burke','Doyle','Lynch','Murray',
+    'Thompson','White','Harris','Clark','Lewis','Robinson','Walker','Young','Allen','King'
+  ];
+
+  var departments = [
+    'Engineering', 'Product Development', 'Commercial', 'Consulting',
+    'Customer Success', 'Marketing', 'Finance', 'Risk',
+    'Supplier', 'Information Security', 'IT Support', 'Infrastructure'
+  ];
+
+  var offices = [
+    'UK', 'US', 'China', 'Singapore', 'Malaysia', 'Australia',
+    'Northern Ireland', 'Canada', 'Brazil', 'Germany', 'Japan', 'South Korea', 'India'
+  ];
+
+  // Weight offices (UK and US have more people)
+  var officeWeights = [
+    'UK','UK','UK','UK','UK',
+    'US','US','US','US',
+    'China','China',
+    'Singapore','Singapore',
+    'India','India','India',
+    'Germany','Germany',
+    'Japan','Japan',
+    'Australia','Australia',
+    'Malaysia',
+    'Canada','Canada',
+    'Brazil',
+    'Northern Ireland',
+    'South Korea'
+  ];
+
+  var vpTitles = [
+    'VP of Engineering', 'VP of Product Development', 'VP of Commercial', 'VP of Consulting',
+    'VP of Customer Success', 'VP of Marketing', 'CFO', 'VP of Risk',
+    'VP of Supplier Relations', 'CISO', 'VP of IT Support', 'VP of Infrastructure'
+  ];
+
+  var managerTitles = {
+    'Engineering': ['Engineering Manager', 'Senior Engineering Manager', 'Principal Engineer', 'Staff Engineer'],
+    'Product Development': ['Product Manager', 'Senior Product Manager', 'Product Lead', 'Development Manager'],
+    'Commercial': ['Sales Manager', 'Business Development Manager', 'Account Director', 'Commercial Lead'],
+    'Consulting': ['Consulting Manager', 'Senior Consultant Lead', 'Practice Manager', 'Engagement Manager'],
+    'Customer Success': ['CS Manager', 'Customer Success Lead', 'Support Manager', 'Client Relations Manager'],
+    'Marketing': ['Marketing Manager', 'Campaign Manager', 'Brand Manager', 'Digital Marketing Lead'],
+    'Finance': ['Finance Manager', 'Financial Controller', 'Senior Accountant', 'FP&A Manager'],
+    'Risk': ['Risk Manager', 'Compliance Manager', 'Risk Analyst Lead', 'Audit Manager'],
+    'Supplier': ['Supplier Manager', 'Procurement Lead', 'Vendor Relations Manager', 'Supply Chain Manager'],
+    'Information Security': ['Security Manager', 'SOC Lead', 'Security Architect', 'GRC Manager'],
+    'IT Support': ['IT Manager', 'Service Desk Lead', 'Systems Manager', 'Technical Support Manager'],
+    'Infrastructure': ['Infrastructure Manager', 'Cloud Operations Lead', 'Network Manager', 'Platform Manager']
+  };
+
+  var icTitles = {
+    'Engineering': ['Software Engineer', 'Senior Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'QA Engineer', 'DevOps Engineer', 'Data Engineer'],
+    'Product Development': ['Product Analyst', 'UX Designer', 'UI Developer', 'Product Specialist', 'Technical Writer', 'UX Researcher'],
+    'Commercial': ['Account Executive', 'Sales Representative', 'Business Development Rep', 'Sales Analyst', 'Account Manager', 'Revenue Analyst'],
+    'Consulting': ['Consultant', 'Senior Consultant', 'Business Analyst', 'Solutions Architect', 'Implementation Specialist'],
+    'Customer Success': ['Customer Success Manager', 'Support Specialist', 'Technical Support Engineer', 'Customer Advocate', 'Onboarding Specialist'],
+    'Marketing': ['Marketing Specialist', 'Content Writer', 'SEO Specialist', 'Social Media Manager', 'Graphic Designer', 'Marketing Analyst'],
+    'Finance': ['Accountant', 'Financial Analyst', 'Payroll Specialist', 'Tax Analyst', 'Billing Specialist', 'Treasury Analyst'],
+    'Risk': ['Risk Analyst', 'Compliance Analyst', 'Internal Auditor', 'Fraud Analyst', 'Regulatory Specialist'],
+    'Supplier': ['Procurement Analyst', 'Supplier Coordinator', 'Vendor Analyst', 'Contract Specialist', 'Sourcing Specialist'],
+    'Information Security': ['Security Analyst', 'Penetration Tester', 'Security Engineer', 'SOC Analyst', 'GRC Analyst'],
+    'IT Support': ['IT Support Specialist', 'Help Desk Analyst', 'Systems Administrator', 'Desktop Support', 'IT Technician'],
+    'Infrastructure': ['Systems Engineer', 'Cloud Engineer', 'Network Engineer', 'Site Reliability Engineer', 'Database Administrator', 'Platform Engineer']
+  };
+
+  var users = [];
+  var nextId = 1;
+
+  function addUser(parentId, name, title, dept, office) {
+    var id = String(nextId++);
+    var email = name.toLowerCase().replace(/[^a-z ]/g, '').replace(/ /g, '.') + '@mintelgroup.com';
+    users.push({
+      id: id,
+      parentId: parentId,
+      displayName: name,
+      jobTitle: title,
+      department: dept,
+      mail: email,
+      officeLocation: office,
+      photo: null
+    });
+    return id;
+  }
+
+  function makeName() {
+    return pick(firstNames) + ' ' + pick(lastNames);
+  }
+
+  // CEO
+  var ceoId = addUser(null, 'Sarah Chen', 'CEO', 'Executive', 'UK');
+
+  // VPs (one per department)
+  var vpIds = [];
+  for (var d = 0; d < departments.length; d++) {
+    var vpId = addUser(ceoId, makeName(), vpTitles[d], departments[d], pick(officeWeights));
+    vpIds.push({ id: vpId, dept: departments[d] });
+  }
+
+  // Managers (~4 per VP = ~48 managers)
+  var mgrIds = [];
+  for (var v = 0; v < vpIds.length; v++) {
+    var dept = vpIds[v].dept;
+    var titles = managerTitles[dept];
+    var numManagers = 3 + Math.floor(rand() * 3); // 3-5 managers per VP
+    for (var m = 0; m < numManagers; m++) {
+      var mgrId = addUser(vpIds[v].id, makeName(), titles[m % titles.length], dept, pick(officeWeights));
+      mgrIds.push({ id: mgrId, dept: dept });
+    }
+  }
+
+  // ICs (~437 to reach ~500 total)
+  var targetTotal = 500;
+  var remaining = targetTotal - users.length;
+  for (var ic = 0; ic < remaining; ic++) {
+    var mgr = pick(mgrIds);
+    var titles2 = icTitles[mgr.dept];
+    addUser(mgr.id, makeName(), pick(titles2), mgr.dept, pick(officeWeights));
+  }
+
+  return users;
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.DataUtils = {
+  computeDepths: function (users) {
+    var idMap = {}, childrenMap = {}, roots = [];
+    var i;
+
+    for (i = 0; i < users.length; i++) {
+      idMap[users[i].id] = users[i];
+      users[i]._depth = 0;
+    }
+
+    for (i = 0; i < users.length; i++) {
+      var pid = users[i].parentId;
+      if (pid && idMap[pid]) {
+        if (!childrenMap[pid]) childrenMap[pid] = [];
+        childrenMap[pid].push(users[i]);
+      } else {
+        roots.push(users[i]);
+      }
+    }
+
+    // BFS
+    var queue = roots.slice();
+    for (i = 0; i < roots.length; i++) roots[i]._depth = 0;
+
+    while (queue.length > 0) {
+      var node = queue.shift();
+      var children = childrenMap[node.id] || [];
+      for (var c = 0; c < children.length; c++) {
+        children[c]._depth = node._depth + 1;
+        queue.push(children[c]);
+      }
+    }
+  },
+
+  getUniqueOffices: function (users) {
+    var set = {};
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].officeLocation) set[users[i].officeLocation] = true;
+    }
+    return Object.keys(set).sort();
+  },
+
+  getUniqueDepartments: function (users) {
+    var set = {};
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].department) set[users[i].department] = true;
+    }
+    return Object.keys(set).sort();
+  },
+
+  getMaxDepth: function (users) {
+    var max = 0;
+    for (var i = 0; i < users.length; i++) {
+      if (users[i]._depth > max) max = users[i]._depth;
+    }
+    return max;
+  },
+
+  search: function (users, query) {
+    if (!query) return users;
+    var q = query.toLowerCase();
+    var results = [];
+    for (var i = 0; i < users.length; i++) {
+      var u = users[i];
+      if (u.displayName.toLowerCase().indexOf(q) !== -1 ||
+          u.jobTitle.toLowerCase().indexOf(q) !== -1 ||
+          u.department.toLowerCase().indexOf(q) !== -1 ||
+          u.mail.toLowerCase().indexOf(q) !== -1 ||
+          u.officeLocation.toLowerCase().indexOf(q) !== -1) {
+        results.push(u);
+      }
+    }
+    return results;
+  }
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.SharePointService = {
+  _siteUrl: null,
+
+  getSiteUrl: function () {
+    var CONFIG = WhosWho.CONFIG;
+    if (CONFIG.siteUrl) return CONFIG.siteUrl;
+    if (this._siteUrl) return this._siteUrl;
+    if (window._spPageContextInfo && window._spPageContextInfo.webAbsoluteUrl) {
+      this._siteUrl = window._spPageContextInfo.webAbsoluteUrl;
+      return this._siteUrl;
+    }
+    var match = window.location.href.match(/(https:\/\/[^/]+\/sites\/[^/]+)/);
+    if (match) {
+      this._siteUrl = match[1];
+      return this._siteUrl;
+    }
+    this._siteUrl = window.location.origin;
+    return this._siteUrl;
+  },
+
+  fetchJson: function (url) {
+    return fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json;odata=verbose', 'Content-Type': 'application/json;odata=verbose' },
+      credentials: 'same-origin'
+    }).then(function (response) {
+      if (response.status === 429) {
+        return new Promise(function (resolve) { setTimeout(resolve, 1000); }).then(function () {
+          return fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json;odata=verbose', 'Content-Type': 'application/json;odata=verbose' },
+            credentials: 'same-origin'
+          });
+        }).then(function (r) {
+          if (!r.ok) throw new Error('API returned ' + r.status + ': ' + r.statusText);
+          return r.json();
+        });
+      }
+      if (!response.ok) throw new Error('API returned ' + response.status + ': ' + response.statusText);
+      return response.json();
+    });
+  },
+
+  getAllUsers: function (onProgress) {
+    var self = this;
+    var CONFIG = WhosWho.CONFIG;
+    var siteUrl = this.getSiteUrl();
+    var users = [];
+    var startRow = 0;
+
+    function fetchPage() {
+      var searchUrl = siteUrl + '/_api/search/query' +
+        "?querytext='*'" +
+        "&sourceid='" + CONFIG.peopleSourceId + "'" +
+        "&selectproperties='AccountName,PreferredName,JobTitle,Department,WorkEmail,OfficeNumber,WorkPhone,PictureURL,Path,UserProfile_GUID'" +
+        '&rowlimit=' + CONFIG.pageSize + '&startrow=' + startRow;
+
+      return self.fetchJson(searchUrl).then(function (data) {
+        var results = data.d && data.d.query && data.d.query.PrimaryQueryResult && data.d.query.PrimaryQueryResult.RelevantResults;
+        if (!results) return users;
+        var totalRows = results.TotalRows || 0;
+        var rows = (results.Table && results.Table.Rows && results.Table.Rows.results) || [];
+        for (var i = 0; i < rows.length; i++) {
+          var cells = {};
+          var cellArray = (rows[i].Cells && rows[i].Cells.results) || [];
+          for (var j = 0; j < cellArray.length; j++) {
+            if (cellArray[j].Key && cellArray[j].Value) cells[cellArray[j].Key] = cellArray[j].Value;
+          }
+          var accountName = cells['AccountName'] || '';
+          if (!accountName) continue;
+          users.push({
+            id: cells['UserProfile_GUID'] || accountName,
+            displayName: cells['PreferredName'] || 'Unknown',
+            jobTitle: cells['JobTitle'] || '',
+            department: cells['Department'] || '',
+            mail: cells['WorkEmail'] || '',
+            officeLocation: cells['OfficeNumber'] || '',
+            userPrincipalName: accountName,
+            parentId: null,
+            photo: cells['PictureURL'] || null
+          });
+        }
+        if (onProgress) onProgress('Loading users... (' + users.length + '/' + totalRows + ')');
+        startRow += CONFIG.pageSize;
+        if (startRow < totalRows) return fetchPage();
+        return users;
+      });
+    }
+    return fetchPage();
+  },
+
+  fetchAllManagers: function (users, onProgress) {
+    var self = this;
+    var CONFIG = WhosWho.CONFIG;
+    var siteUrl = this.getSiteUrl();
+    var accountMap = {};
+    for (var i = 0; i < users.length; i++) accountMap[users[i].userPrincipalName.toLowerCase()] = users[i];
+    var completed = 0, total = users.length, index = 0;
+
+    function processBatch() {
+      var batch = users.slice(index, index + CONFIG.managerBatchSize);
+      if (batch.length === 0) return Promise.resolve();
+      index += batch.length;
+      var promises = batch.map(function (user) {
+        var encodedAccount = encodeURIComponent('i:0#.f|membership|' + user.userPrincipalName);
+        var profileUrl = siteUrl + '/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)' +
+          "?@v='" + encodedAccount + "'&$select=UserProfileProperties";
+        return self.fetchJson(profileUrl).then(function (profileData) {
+          var properties = (profileData.d && profileData.d.UserProfileProperties && profileData.d.UserProfileProperties.results) || [];
+          for (var p = 0; p < properties.length; p++) {
+            if (properties[p].Key === 'Manager' && properties[p].Value) {
+              var managerUser = accountMap[properties[p].Value.toLowerCase()];
+              if (managerUser) user.parentId = managerUser.id;
+              break;
+            }
+          }
+        }).catch(function () {}).then(function () {
+          completed++;
+          if (onProgress) onProgress('Loading managers... (' + completed + '/' + total + ')');
+        });
+      });
+      return Promise.all(promises).then(function () { if (index < users.length) return processBatch(); });
+    }
+    return processBatch();
+  }
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.ChartRenderer = {
+  _container: null,
+  _data: null,
+  _tree: null,
+  _highlightedId: null,
+  _collapsed: {},
+
+  init: function (containerEl) {
+    this._container = containerEl;
+  },
+
+  _buildTree: function (data) {
+    var map = {}, roots = [], i;
+    for (i = 0; i < data.length; i++) map[data[i].id] = { data: data[i], children: [] };
+    for (i = 0; i < data.length; i++) {
+      var node = map[data[i].id], parentId = data[i].parentId;
+      if (parentId && map[parentId]) map[parentId].children.push(node);
+      else roots.push(node);
+    }
+    return roots;
+  },
+
+  render: function (data) {
+    this._data = data;
+    this._tree = this._buildTree(data);
+    this._drawTree();
+  },
+
+  _drawTree: function () {
+    this._container.innerHTML = '';
+    var viewport = document.createElement('div');
+    viewport.className = 'org-viewport';
+    var treeEl = document.createElement('div');
+    treeEl.className = 'org-tree';
+    for (var i = 0; i < this._tree.length; i++) treeEl.appendChild(this._renderNode(this._tree[i]));
+    viewport.appendChild(treeEl);
+    this._container.appendChild(viewport);
+  },
+
+  _renderNode: function (node) {
+    var self = this;
+    var wrapper = document.createElement('div');
+    wrapper.className = 'org-node-wrapper';
+    var card = document.createElement('div');
+    card.className = 'org-card';
+    if (node.data.id === this._highlightedId) card.classList.add('org-card--highlighted');
+    card.setAttribute('data-id', node.data.id);
+    card.innerHTML = this._cardHtml(node.data, node.children.length);
+
+    if (node.children.length > 0) {
+      var toggleBtn = card.querySelector('.org-toggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          self._collapsed[node.data.id] = !self._collapsed[node.data.id];
+          self._drawTree();
+        });
+      }
+    }
+    wrapper.appendChild(card);
+
+    if (node.children.length > 0 && !this._collapsed[node.data.id]) {
+      var childrenContainer = document.createElement('div');
+      childrenContainer.className = 'org-children';
+      for (var i = 0; i < node.children.length; i++) childrenContainer.appendChild(this._renderNode(node.children[i]));
+      wrapper.appendChild(childrenContainer);
+    }
+    return wrapper;
+  },
+
+  _cardHtml: function (node, childCount) {
+    var initials = node.displayName.split(' ').map(function (n) { return n[0]; }).join('').substring(0, 2).toUpperCase();
+    var photoHtml = node.photo
+      ? '<img class="org-avatar-img" src="' + node.photo + '" alt="" />'
+      : '<span>' + initials + '</span>';
+
+    var toggleHtml = '';
+    if (childCount > 0) {
+      var isCollapsed = this._collapsed[node.id];
+      var arrow = isCollapsed ? '&#9654;' : '&#9660;';
+      toggleHtml = '<button class="org-toggle" title="Expand/Collapse">' + arrow + ' ' + childCount + '</button>';
+    }
+
+    var parts = [];
+    if (node.department) parts.push(node.department);
+    if (node.officeLocation) parts.push(node.officeLocation);
+    var metaHtml = parts.length > 0 ? '<div class="org-card-meta">' + parts.join(' &middot; ') + '</div>' : '';
+
+    return '<div class="org-avatar">' + photoHtml + '</div>' +
+      '<div class="org-card-info">' +
+        '<div class="org-card-name">' + node.displayName + '</div>' +
+        '<div class="org-card-title">' + (node.jobTitle || '') + '</div>' +
+        metaHtml +
+      '</div>' + toggleHtml;
+  },
+
+  highlightAndCenter: function (userId) {
+    this._highlightedId = userId;
+    var parentMap = {};
+    for (var i = 0; i < this._data.length; i++) parentMap[this._data[i].id] = this._data[i].parentId;
+    var current = parentMap[userId];
+    while (current) { this._collapsed[current] = false; current = parentMap[current]; }
+    this._drawTree();
+    var el = this._container.querySelector('[data-id="' + userId + '"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  },
+
+  clearHighlight: function () {
+    this._highlightedId = null;
+    this._drawTree();
+  }
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.SearchController = {
+  _inputEl: null,
+  _resultsEl: null,
+  _users: [],
+  _onSelect: null,
+
+  init: function (inputEl, resultsEl, users, onSelect) {
+    this._inputEl = inputEl;
+    this._resultsEl = resultsEl;
+    this._users = users;
+    this._onSelect = onSelect;
+
+    var self = this;
+    inputEl.addEventListener('input', function () {
+      var query = inputEl.value;
+      if (!query || query.length < 2) { self.hideResults(); if (!query) onSelect(null); return; }
+      self.showResults(self.search(query));
+    });
+    inputEl.addEventListener('keydown', function (e) { if (e.key === 'Escape') self.hideResults(); });
+    document.addEventListener('click', function (e) {
+      if (!inputEl.contains(e.target) && !resultsEl.contains(e.target)) self.hideResults();
+    });
+  },
+
+  search: function (query) {
+    var q = query.toLowerCase(), results = [];
+    for (var i = 0; i < this._users.length && results.length < 10; i++) {
+      var u = this._users[i];
+      if (u.displayName.toLowerCase().indexOf(q) !== -1 || u.jobTitle.toLowerCase().indexOf(q) !== -1 ||
+          u.department.toLowerCase().indexOf(q) !== -1 || u.mail.toLowerCase().indexOf(q) !== -1)
+        results.push(u);
+    }
+    return results;
+  },
+
+  showResults: function (results) {
+    var self = this;
+    this._resultsEl.innerHTML = '';
+    if (results.length === 0) { this.hideResults(); return; }
+    for (var i = 0; i < results.length; i++) {
+      (function (user) {
+        var btn = document.createElement('button');
+        btn.className = 'search-result-item';
+        btn.type = 'button';
+        btn.innerHTML = '<div class="search-result-name">' + user.displayName + '</div>' +
+          '<div class="search-result-detail">' + user.jobTitle + (user.department ? ' \u2022 ' + user.department : '') + '</div>';
+        btn.addEventListener('click', function () {
+          self._inputEl.value = user.displayName;
+          self.hideResults();
+          self._onSelect(user.id);
+        });
+        self._resultsEl.appendChild(btn);
+      })(results[i]);
+    }
+    this._resultsEl.classList.add('visible');
+  },
+
+  hideResults: function () {
+    this._resultsEl.classList.remove('visible');
+  }
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.DirectoryController = {
+  _toolbarEl: null,
+  _gridWrapperEl: null,
+  _gridEl: null,
+  _countEl: null,
+  _users: [],
+  _filtered: [],
+  _onViewInChart: null,
+  _displayLimit: 100,
+  _filters: { query: '', offices: [], depth: null },
+
+  init: function (toolbarEl, gridWrapperEl, users, onViewInChart) {
+    this._toolbarEl = toolbarEl;
+    this._gridWrapperEl = gridWrapperEl;
+    this._users = users;
+    this._onViewInChart = onViewInChart;
+
+    // Create grid inside wrapper
+    this._gridEl = document.createElement('div');
+    this._gridEl.className = 'directory-grid';
+    this._gridWrapperEl.appendChild(this._gridEl);
+
+    this._buildToolbar();
+    this._applyFilters();
+  },
+
+  _buildToolbar: function () {
+    var self = this;
+    var DataUtils = WhosWho.DataUtils;
+    this._toolbarEl.innerHTML = '';
+
+    // Search input
+    var searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'directory-search';
+    searchInput.placeholder = 'Search people...';
+    searchInput.autocomplete = 'off';
+    searchInput.addEventListener('input', function () {
+      self._filters.query = searchInput.value;
+      self._displayLimit = 100;
+      self._applyFilters();
+    });
+    this._toolbarEl.appendChild(searchInput);
+
+    // Office multi-select
+    this._buildOfficeFilter();
+
+    // Depth filter
+    this._buildDepthFilter();
+
+    // Result count
+    this._countEl = document.createElement('span');
+    this._countEl.className = 'directory-result-count';
+    this._toolbarEl.appendChild(this._countEl);
+  },
+
+  _buildOfficeFilter: function () {
+    var self = this;
+    var offices = WhosWho.DataUtils.getUniqueOffices(this._users);
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'filter-multiselect';
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'filter-multiselect-btn';
+    btn.textContent = 'All Offices';
+
+    var menu = document.createElement('div');
+    menu.className = 'filter-multiselect-menu';
+
+    for (var i = 0; i < offices.length; i++) {
+      (function (office) {
+        var label = document.createElement('label');
+        label.className = 'filter-multiselect-option';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = office;
+        cb.addEventListener('change', function () {
+          var selected = self._filters.offices;
+          if (cb.checked) {
+            selected.push(office);
+          } else {
+            var idx = selected.indexOf(office);
+            if (idx !== -1) selected.splice(idx, 1);
+          }
+          btn.textContent = selected.length === 0 ? 'All Offices' : selected.length + ' office' + (selected.length > 1 ? 's' : '');
+          self._displayLimit = 100;
+          self._applyFilters();
+        });
+        var span = document.createElement('span');
+        span.textContent = office;
+        label.appendChild(cb);
+        label.appendChild(span);
+        menu.appendChild(label);
+      })(offices[i]);
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('visible');
+    });
+
+    // Close on click outside
+    document.addEventListener('click', function (e) {
+      if (!wrapper.contains(e.target)) menu.classList.remove('visible');
+    });
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(menu);
+    this._toolbarEl.appendChild(wrapper);
+  },
+
+  _buildDepthFilter: function () {
+    var self = this;
+    var maxDepth = WhosWho.DataUtils.getMaxDepth(this._users);
+
+    var select = document.createElement('select');
+    select.className = 'directory-filter';
+
+    var optAll = document.createElement('option');
+    optAll.value = '';
+    optAll.textContent = 'All Levels';
+    select.appendChild(optAll);
+
+    for (var d = 0; d <= maxDepth; d++) {
+      var opt = document.createElement('option');
+      opt.value = String(d);
+      opt.textContent = 'Level ' + (d + 1);
+      select.appendChild(opt);
+    }
+
+    select.addEventListener('change', function () {
+      self._filters.depth = select.value === '' ? null : parseInt(select.value, 10);
+      self._displayLimit = 100;
+      self._applyFilters();
+    });
+
+    this._toolbarEl.appendChild(select);
+  },
+
+  _applyFilters: function () {
+    var DataUtils = WhosWho.DataUtils;
+    var results = this._users;
+
+    // Text search
+    if (this._filters.query) {
+      results = DataUtils.search(results, this._filters.query);
+    }
+
+    // Office filter
+    if (this._filters.offices.length > 0) {
+      var officeSet = {};
+      for (var i = 0; i < this._filters.offices.length; i++) officeSet[this._filters.offices[i]] = true;
+      results = results.filter(function (u) { return officeSet[u.officeLocation]; });
+    }
+
+    // Depth filter
+    if (this._filters.depth !== null) {
+      var depth = this._filters.depth;
+      results = results.filter(function (u) { return u._depth === depth; });
+    }
+
+    this._filtered = results;
+    this._renderCards();
+  },
+
+  _renderCards: function () {
+    var self = this;
+    this._gridEl.innerHTML = '';
+    var results = this._filtered;
+    var total = results.length;
+
+    // Update count
+    if (this._countEl) {
+      if (total === this._users.length) {
+        this._countEl.textContent = total + ' people';
+      } else {
+        this._countEl.textContent = total + ' of ' + this._users.length + ' people';
+      }
+    }
+
+    if (total === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'directory-empty';
+      empty.textContent = 'No people match your filters.';
+      this._gridEl.appendChild(empty);
+      return;
+    }
+
+    var limit = Math.min(total, this._displayLimit);
+    for (var i = 0; i < limit; i++) {
+      this._gridEl.appendChild(this._createCard(results[i]));
+    }
+
+    // Show more button
+    if (total > limit) {
+      var moreDiv = document.createElement('div');
+      moreDiv.className = 'directory-show-more';
+      var moreBtn = document.createElement('button');
+      moreBtn.type = 'button';
+      moreBtn.className = 'directory-show-more-btn';
+      moreBtn.textContent = 'Show more (' + (total - limit) + ' remaining)';
+      moreBtn.addEventListener('click', function () {
+        self._displayLimit += 100;
+        self._renderCards();
+      });
+      moreDiv.appendChild(moreBtn);
+      this._gridEl.appendChild(moreDiv);
+    }
+  },
+
+  _createCard: function (user) {
+    var self = this;
+    var card = document.createElement('div');
+    card.className = 'directory-card';
+
+    // Avatar
+    var avatar = document.createElement('div');
+    avatar.className = 'org-avatar';
+    var initials = user.displayName.split(' ').map(function (n) { return n[0]; }).join('').substring(0, 2).toUpperCase();
+    if (user.photo) {
+      avatar.innerHTML = '<img class="org-avatar-img" src="' + user.photo + '" alt="" />';
+    } else {
+      avatar.innerHTML = '<span>' + initials + '</span>';
+    }
+    card.appendChild(avatar);
+
+    // Body
+    var body = document.createElement('div');
+    body.className = 'directory-card-body';
+
+    var nameEl = document.createElement('div');
+    nameEl.className = 'directory-card-name';
+    nameEl.textContent = user.displayName;
+    body.appendChild(nameEl);
+
+    var titleEl = document.createElement('div');
+    titleEl.className = 'directory-card-title';
+    titleEl.textContent = user.jobTitle;
+    body.appendChild(titleEl);
+
+    var parts = [];
+    if (user.department) parts.push(user.department);
+    if (user.officeLocation) parts.push(user.officeLocation);
+    if (parts.length > 0) {
+      var detailEl = document.createElement('div');
+      detailEl.className = 'directory-card-detail';
+      detailEl.textContent = parts.join(' \u00B7 ');
+      body.appendChild(detailEl);
+    }
+
+    // Footer with action + depth badge
+    var footer = document.createElement('div');
+    footer.className = 'directory-card-footer';
+
+    var actionBtn = document.createElement('button');
+    actionBtn.type = 'button';
+    actionBtn.className = 'directory-card-action';
+    actionBtn.textContent = 'View in Org Chart \u2192';
+    actionBtn.addEventListener('click', function () {
+      self._onViewInChart(user.id);
+    });
+    footer.appendChild(actionBtn);
+
+    if (typeof user._depth === 'number') {
+      var badge = document.createElement('span');
+      badge.className = 'depth-badge';
+      badge.textContent = 'Level ' + (user._depth + 1);
+      footer.appendChild(badge);
+    }
+
+    body.appendChild(footer);
+    card.appendChild(body);
+    return card;
+  }
+};
+var WhosWho = window.WhosWho || (window.WhosWho = {});
+
+WhosWho.App = {
+  _activeView: 'chart',
+  _data: null,
+
+  init: function () {
+    var CONFIG = WhosWho.CONFIG;
+    var loadingEl = document.getElementById('loading-overlay');
+    var loadingTextEl = document.getElementById('loading-text');
+    var errorEl = document.getElementById('error-container');
+    var errorMsgEl = document.getElementById('error-message');
+    var retryBtn = document.getElementById('retry-button');
+
+    var chartContainer = document.getElementById('chart-container');
+    var directoryToolbar = document.getElementById('directory-toolbar');
+    var directoryGridWrapper = document.getElementById('directory-grid-wrapper');
+    var searchInput = document.getElementById('search-input');
+    var searchResults = document.getElementById('search-results');
+
+    // Reset UI
+    loadingEl.classList.remove('hidden');
+    errorEl.classList.remove('visible');
+    chartContainer.innerHTML = '';
+    searchInput.value = '';
+
+    retryBtn.addEventListener('click', function () { WhosWho.App.init(); });
+
+    this._setupTabs();
+
+    WhosWho.ChartRenderer.init(chartContainer);
+
+    var dataPromise;
+
+    if (CONFIG.useMockData) {
+      loadingTextEl.textContent = 'Generating mock directory...';
+      dataPromise = new Promise(function (resolve) {
+        setTimeout(function () { resolve(WhosWho.generateMockData()); }, 200);
+      });
+    } else {
+      dataPromise = WhosWho.SharePointService.getAllUsers(function (msg) { loadingTextEl.textContent = msg; })
+        .then(function (users) {
+          loadingTextEl.textContent = 'Loading manager relationships...';
+          return WhosWho.SharePointService.fetchAllManagers(users, function (msg) { loadingTextEl.textContent = msg; })
+            .then(function () {
+              return users.map(function (u) {
+                return { id: u.id, parentId: u.parentId, displayName: u.displayName, jobTitle: u.jobTitle,
+                  department: u.department, mail: u.mail, officeLocation: u.officeLocation, photo: u.photo };
+              });
+            });
+        });
+    }
+
+    var self = this;
+
+    dataPromise.then(function (data) {
+      self._data = data;
+
+      // Compute depths for filtering
+      WhosWho.DataUtils.computeDepths(data);
+
+      loadingEl.classList.add('hidden');
+
+      // Org Chart
+      WhosWho.ChartRenderer.render(data);
+
+      // Header search (quick-jump to org chart)
+      WhosWho.SearchController.init(searchInput, searchResults, data, function (userId) {
+        if (userId) {
+          self.switchView('chart');
+          WhosWho.ChartRenderer.highlightAndCenter(userId);
+        } else {
+          WhosWho.ChartRenderer.clearHighlight();
+        }
+      });
+
+      // Directory
+      WhosWho.DirectoryController.init(directoryToolbar, directoryGridWrapper, data, function (userId) {
+        self.viewInChart(userId);
+      });
+
+    }).catch(function (err) {
+      console.error('Failed to load org chart data:', err);
+      loadingEl.classList.add('hidden');
+      errorMsgEl.textContent = 'Something went wrong: ' + (err.message || err) + '. Please try again.';
+      errorEl.classList.add('visible');
+    });
+  },
+
+  _setupTabs: function () {
+    var self = this;
+    var tabs = document.querySelectorAll('.view-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      (function (tab) {
+        tab.addEventListener('click', function () {
+          self.switchView(tab.getAttribute('data-view'));
+        });
+      })(tabs[i]);
+    }
+  },
+
+  switchView: function (viewName) {
+    this._activeView = viewName;
+
+    // Update tabs
+    var tabs = document.querySelectorAll('.view-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].getAttribute('data-view') === viewName) {
+        tabs[i].classList.add('view-tab--active');
+      } else {
+        tabs[i].classList.remove('view-tab--active');
+      }
+    }
+
+    // Update views
+    var views = document.querySelectorAll('.view');
+    for (var j = 0; j < views.length; j++) {
+      if (views[j].id === viewName + '-view') {
+        views[j].classList.add('view--active');
+      } else {
+        views[j].classList.remove('view--active');
+      }
+    }
+  },
+
+  viewInChart: function (userId) {
+    this.switchView('chart');
+    WhosWho.ChartRenderer.highlightAndCenter(userId);
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+  WhosWho.App.init();
+});
+  </script>
+</body>
+</html>
