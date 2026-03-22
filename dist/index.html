@@ -1050,32 +1050,33 @@ WhosWho.generateMockData = function () {
   // CEO
   var ceoId = addUser(null, 'Sarah Chen', 'CEO', 'Executive', 'UK');
 
-  // VPs (one per department)
+  // VPs (one per department) — CEO has 12 direct reports (department heads)
   var vpIds = [];
   for (var d = 0; d < departments.length; d++) {
     var vpId = addUser(ceoId, makeName(), vpTitles[d], departments[d], pick(officeWeights));
     vpIds.push({ id: vpId, dept: departments[d] });
   }
 
-  // Managers (~4 per VP = ~48 managers)
+  // Managers (4-6 per VP)
   var mgrIds = [];
   for (var v = 0; v < vpIds.length; v++) {
     var dept = vpIds[v].dept;
     var titles = managerTitles[dept];
-    var numManagers = 3 + Math.floor(rand() * 3); // 3-5 managers per VP
+    var numManagers = 4 + Math.floor(rand() * 3); // 4-6 managers per VP
     for (var m = 0; m < numManagers; m++) {
       var mgrId = addUser(vpIds[v].id, makeName(), titles[m % titles.length], dept, pick(officeWeights));
       mgrIds.push({ id: mgrId, dept: dept });
     }
   }
 
-  // ICs (~437 to reach ~500 total)
-  var targetTotal = 500;
-  var remaining = targetTotal - users.length;
-  for (var ic = 0; ic < remaining; ic++) {
-    var mgr = pick(mgrIds);
+  // ICs (4-6 per manager)
+  for (var mi = 0; mi < mgrIds.length; mi++) {
+    var mgr = mgrIds[mi];
     var titles2 = icTitles[mgr.dept];
-    addUser(mgr.id, makeName(), pick(titles2), mgr.dept, pick(officeWeights));
+    var numICs = 4 + Math.floor(rand() * 3); // 4-6 ICs per manager
+    for (var ic = 0; ic < numICs; ic++) {
+      addUser(mgr.id, makeName(), pick(titles2), mgr.dept, pick(officeWeights));
+    }
   }
 
   return users;
