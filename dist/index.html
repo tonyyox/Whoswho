@@ -970,14 +970,14 @@ WhosWho.generateMockData = function () {
     'South Korea'
   ];
 
-  // C-suite: 6 executives report to CEO, each overseeing 2 departments
+  // C-suite: 6 executives report to CEO (max 6 direct reports)
   var cSuite = [
-    { title: 'CTO',            depts: ['Engineering', 'Infrastructure'] },
-    { title: 'CPO',            depts: ['Product Development', 'Customer Success'] },
-    { title: 'CRO',            depts: ['Commercial', 'Consulting'] },
-    { title: 'CMO',            depts: ['Marketing', 'Supplier'] },
-    { title: 'CFO',            depts: ['Finance', 'Risk'] },
-    { title: 'CIO',            depts: ['Information Security', 'IT Support'] }
+    { name: 'Tony Yoxall',  title: 'COO',  depts: ['Commercial', 'Consulting'] },
+    { name: null,            title: 'CTO',  depts: ['Engineering', 'Infrastructure'] },
+    { name: null,            title: 'CPO',  depts: ['Product Development', 'Customer Success'] },
+    { name: null,            title: 'CMO',  depts: ['Marketing', 'Supplier'] },
+    { name: null,            title: 'CFO',  depts: ['Finance', 'Risk'] },
+    { name: null,            title: 'CIO',  depts: ['Information Security', 'IT Support'] }
   ];
 
   var vpTitles = {
@@ -1074,7 +1074,7 @@ WhosWho.generateMockData = function () {
   var vpIds = [];
   for (var cs = 0; cs < cSuite.length; cs++) {
     var exec = cSuite[cs];
-    var execId = addUser(ceoId, makeName(), exec.title, 'Executive', pick(officeWeights));
+    var execId = addUser(ceoId, exec.name || makeName(), exec.title, 'Executive', pick(officeWeights));
     for (var di = 0; di < exec.depts.length; di++) {
       var dept = exec.depts[di];
       var vpId = addUser(execId, makeName(), vpTitles[dept], dept, pick(officeWeights));
