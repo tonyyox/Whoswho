@@ -970,11 +970,30 @@ WhosWho.generateMockData = function () {
     'South Korea'
   ];
 
-  var vpTitles = [
-    'VP of Engineering', 'VP of Product Development', 'VP of Commercial', 'VP of Consulting',
-    'VP of Customer Success', 'VP of Marketing', 'CFO', 'VP of Risk',
-    'VP of Supplier Relations', 'CISO', 'VP of IT Support', 'VP of Infrastructure'
+  // C-suite: 6 executives report to CEO, each overseeing 2 departments
+  var cSuite = [
+    { title: 'CTO',            depts: ['Engineering', 'Infrastructure'] },
+    { title: 'CPO',            depts: ['Product Development', 'Customer Success'] },
+    { title: 'CRO',            depts: ['Commercial', 'Consulting'] },
+    { title: 'CMO',            depts: ['Marketing', 'Supplier'] },
+    { title: 'CFO',            depts: ['Finance', 'Risk'] },
+    { title: 'CIO',            depts: ['Information Security', 'IT Support'] }
   ];
+
+  var vpTitles = {
+    'Engineering': 'VP of Engineering',
+    'Product Development': 'VP of Product Development',
+    'Commercial': 'VP of Commercial',
+    'Consulting': 'VP of Consulting',
+    'Customer Success': 'VP of Customer Success',
+    'Marketing': 'VP of Marketing',
+    'Finance': 'VP of Finance',
+    'Risk': 'VP of Risk',
+    'Supplier': 'VP of Supplier Relations',
+    'Information Security': 'VP of Information Security',
+    'IT Support': 'VP of IT Support',
+    'Infrastructure': 'VP of Infrastructure'
+  };
 
   var managerTitles = {
     'Engineering': ['Engineering Manager', 'Senior Engineering Manager', 'Principal Engineer', 'Staff Engineer'],
@@ -1051,11 +1070,16 @@ WhosWho.generateMockData = function () {
   // CEO
   var ceoId = addUser(null, 'Sarah Chen', 'CEO', 'Executive', 'UK');
 
-  // VPs (one per department) — CEO has 12 direct reports (department heads)
+  // C-suite (6 direct reports to CEO, each overseeing 2 department VPs)
   var vpIds = [];
-  for (var d = 0; d < departments.length; d++) {
-    var vpId = addUser(ceoId, makeName(), vpTitles[d], departments[d], pick(officeWeights));
-    vpIds.push({ id: vpId, dept: departments[d] });
+  for (var cs = 0; cs < cSuite.length; cs++) {
+    var exec = cSuite[cs];
+    var execId = addUser(ceoId, makeName(), exec.title, 'Executive', pick(officeWeights));
+    for (var di = 0; di < exec.depts.length; di++) {
+      var dept = exec.depts[di];
+      var vpId = addUser(execId, makeName(), vpTitles[dept], dept, pick(officeWeights));
+      vpIds.push({ id: vpId, dept: dept });
+    }
   }
 
   // Managers (4-6 per VP)
