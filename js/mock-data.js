@@ -173,13 +173,14 @@ WhosWho.generateMockData = function () {
     }
   }
 
-  // ICs (~437 to reach ~500 total)
-  var targetTotal = 500;
-  var remaining = targetTotal - users.length;
-  for (var ic = 0; ic < remaining; ic++) {
-    var mgr = pick(mgrIds);
+  // ICs: each manager gets 3-7 direct reports
+  for (var i = 0; i < mgrIds.length; i++) {
+    var mgr = mgrIds[i];
+    var numReports = 3 + Math.floor(rand() * 5); // 3-7 direct reports
     var titles2 = icTitles[mgr.dept];
-    addUser(mgr.id, makeName(), pick(titles2), mgr.dept, pick(officeWeights));
+    for (var r = 0; r < numReports; r++) {
+      addUser(mgr.id, makeName(), pick(titles2), mgr.dept, pick(officeWeights));
+    }
   }
 
   return users;
