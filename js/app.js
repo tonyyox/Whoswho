@@ -1,7 +1,7 @@
 var WhosWho = window.WhosWho || (window.WhosWho = {});
 
 WhosWho.App = {
-  _activeView: 'chart',
+  _activeView: 'newjoiners',
   _data: null,
 
   init: function () {
@@ -15,6 +15,7 @@ WhosWho.App = {
     var chartContainer = document.getElementById('chart-container');
     var directoryToolbar = document.getElementById('directory-toolbar');
     var directoryGridWrapper = document.getElementById('directory-grid-wrapper');
+    var newjoinersContainer = document.getElementById('newjoiners-container');
     var searchInput = document.getElementById('search-input');
     var searchResults = document.getElementById('search-results');
 
@@ -76,6 +77,11 @@ WhosWho.App = {
 
       // Directory
       WhosWho.DirectoryController.init(directoryToolbar, directoryGridWrapper, data, function (userId) {
+        self.viewInChart(userId);
+      });
+
+      // New Joiners
+      WhosWho.NewJoinersController.init(newjoinersContainer, data, function (userId) {
         self.viewInChart(userId);
       });
 

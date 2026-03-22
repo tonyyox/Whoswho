@@ -7,13 +7,15 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/orgchart.css">
   <link rel="stylesheet" href="css/directory.css">
+  <link rel="stylesheet" href="css/new-joiners.css">
 </head>
 <body>
   <div class="app-container">
     <header class="header">
       <h1 class="title">Who's Who</h1>
       <nav class="view-tabs">
-        <button class="view-tab view-tab--active" data-view="chart">Org Chart</button>
+        <button class="view-tab view-tab--active" data-view="newjoiners">New Joiners</button>
+        <button class="view-tab" data-view="chart">Org Chart</button>
         <button class="view-tab" data-view="directory">Directory</button>
       </nav>
       <div class="search-container">
@@ -39,7 +41,10 @@
     </div>
 
     <div class="view-container">
-      <section id="chart-view" class="view view--active">
+      <section id="newjoiners-view" class="view view--active">
+        <div id="newjoiners-container" class="newjoiners-grid-wrapper"></div>
+      </section>
+      <section id="chart-view" class="view">
         <div id="chart-container" class="chart-container"></div>
       </section>
       <section id="directory-view" class="view">
@@ -56,6 +61,7 @@
   <script src="js/chart-renderer.js"></script>
   <script src="js/search.js"></script>
   <script src="js/directory.js"></script>
+  <script src="js/new-joiners.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

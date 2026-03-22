@@ -8,14 +8,14 @@ mkdir -p dist
 
 # Concatenate CSS
 CSS=""
-for f in css/base.css css/orgchart.css css/directory.css; do
+for f in css/base.css css/orgchart.css css/directory.css css/new-joiners.css; do
   CSS="$CSS$(cat "$f")
 "
 done
 
 # Concatenate JS
 JS=""
-for f in js/config.js js/mock-data.js js/data-utils.js js/sharepoint.js js/chart-renderer.js js/search.js js/directory.js js/app.js; do
+for f in js/config.js js/mock-data.js js/data-utils.js js/sharepoint.js js/chart-renderer.js js/search.js js/directory.js js/new-joiners.js js/app.js; do
   JS="$JS$(cat "$f")
 "
 done

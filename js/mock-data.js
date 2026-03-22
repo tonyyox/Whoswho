@@ -111,6 +111,24 @@ WhosWho.generateMockData = function () {
 
   var users = [];
   var nextId = 1;
+  var now = new Date();
+
+  function randomStartDate() {
+    // ~8% chance of being a new joiner (within last 30 days)
+    if (rand() < 0.08) {
+      var daysAgo = Math.floor(rand() * 30);
+      var d = new Date(now);
+      d.setDate(d.getDate() - daysAgo);
+      return d.toISOString().split('T')[0];
+    }
+    // Otherwise random date 1-5 years ago
+    var yearsAgo = 1 + rand() * 4;
+    var d2 = new Date(now);
+    d2.setFullYear(d2.getFullYear() - Math.floor(yearsAgo));
+    d2.setMonth(Math.floor(rand() * 12));
+    d2.setDate(1 + Math.floor(rand() * 27));
+    return d2.toISOString().split('T')[0];
+  }
 
   function addUser(parentId, name, title, dept, office) {
     var id = String(nextId++);
@@ -123,6 +141,7 @@ WhosWho.generateMockData = function () {
       department: dept,
       mail: email,
       officeLocation: office,
+      startDate: randomStartDate(),
       photo: null
     });
     return id;
