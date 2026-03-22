@@ -61,7 +61,7 @@
   background: #ffffff;
   border: 1px solid #edebe9;
   border-radius: 8px;
-  border-left: 4px solid #0078d4;
+  border-left: 4px solid #FDB913;
   cursor: pointer;
   transition: box-shadow 0.2s, border-color 0.2s;
   backface-visibility: hidden;
@@ -80,11 +80,11 @@
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 2px solid #0078d4;
+  border: 2px solid #FDB913;
   border-radius: 8px;
   padding: 14px 16px;
   box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+  box-shadow: 0 4px 12px rgba(253, 185, 19, 0.15);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform: rotateY(180deg);
@@ -142,7 +142,7 @@
 
 .newjoiners-card-date {
   font-size: 12px;
-  color: #0078d4;
+  color: #7A5A00;
   font-weight: 600;
   margin-top: 6px;
 }

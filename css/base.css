@@ -66,8 +66,8 @@ body {
 }
 
 .view-tab--active {
-  color: #0078d4;
-  border-bottom-color: #0078d4;
+  color: #7A5A00;
+  border-bottom-color: #FDB913;
   font-weight: 600;
 }
 
@@ -111,7 +111,7 @@ body {
 }
 
 .search-input:focus {
-  border-color: #0078d4;
+  border-color: #FDB913;
 }
 
 .search-input::placeholder {
@@ -189,7 +189,7 @@ body {
   width: 36px;
   height: 36px;
   border: 3px solid #edebe9;
-  border-top-color: #0078d4;
+  border-top-color: #FDB913;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -228,8 +228,8 @@ body {
 
 .retry-button {
   padding: 8px 20px;
-  background: #0078d4;
-  color: #ffffff;
+  background: #FDB913;
+  color: #323130;
   border: none;
   border-radius: 4px;
   font-size: 14px;
@@ -239,5 +239,5 @@ body {
 }
 
 .retry-button:hover {
-  background: #106ebe;
+  background: #E5A711;
 }

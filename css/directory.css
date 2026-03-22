@@ -27,7 +27,7 @@
 }
 
 .directory-search:focus {
-  border-color: #0078d4;
+  border-color: #FDB913;
 }
 
 .directory-search::placeholder {
@@ -50,7 +50,7 @@
 }
 
 .directory-filter:focus {
-  border-color: #0078d4;
+  border-color: #FDB913;
 }
 
 /* ---- Multi-select dropdown ---- */
@@ -87,7 +87,7 @@
 }
 
 .filter-multiselect-btn:focus {
-  border-color: #0078d4;
+  border-color: #FDB913;
 }
 
 .filter-multiselect-menu {
@@ -128,7 +128,7 @@
 
 .filter-multiselect-option input[type="checkbox"] {
   margin: 0;
-  accent-color: #0078d4;
+  accent-color: #FDB913;
 }
 
 /* ---- Result count ---- */
@@ -202,11 +202,11 @@
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 2px solid #0078d4;
+  border: 2px solid #FDB913;
   border-radius: 8px;
   padding: 14px 16px;
   box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+  box-shadow: 0 4px 12px rgba(253, 185, 19, 0.15);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform: rotateY(180deg);
@@ -266,7 +266,7 @@
 .directory-card-action {
   border: none;
   background: none;
-  color: #0078d4;
+  color: #7A5A00;
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
@@ -281,8 +281,8 @@
 .depth-badge {
   display: inline-block;
   font-size: 10px;
-  background: #f0f6ff;
-  color: #0078d4;
+  background: #FFF8E5;
+  color: #7A5A00;
   padding: 2px 8px;
   border-radius: 10px;
   white-space: nowrap;
